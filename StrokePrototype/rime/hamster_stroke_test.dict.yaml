@@ -1,0 +1,10 @@
+# Prototype; upstream character data remains in its own namespaced table.
+---
+name: hamster_stroke_test
+version: "0.1"
+sort: by_weight
+use_preset_vocabulary: false
+import_tables:
+  - hamster_stroke_chars
+  - hamster_stroke_phrases
+...

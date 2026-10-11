@@ -1,0 +1,38 @@
+.DS_Store
+.build
+.swiftpm
+.netrc
+/lib
+.vscode
+.plum
+.deps
+.HamsterInputSchemas
+Resources/SharedSupport/SharedSupport.zip
+Resources/SharedSupport/schemas/wanxiang/dicts/
+Resources/SharedSupport/schemas/wanxiang/wanxiang_reverse.dict.yaml
+*.tgz
+
+# Frameworks - only track librime (custom build), others downloadable via librimeFramework.sh
+Frameworks/boost_*.xcframework
+Frameworks/libglog.xcframework
+Frameworks/libleveldb.xcframework
+Frameworks/libmarisa.xcframework
+Frameworks/libopencc.xcframework
+Frameworks/libyaml-cpp.xcframework
+
+
+# xcode gitignore
+# https://github.com/github/gitignore/blob/main/Global/Xcode.gitignore
+## User settings
+xcuserdata/
+## Xcode 8 and earlier
+*.xcscmblueprint
+*.xccheckout
+.history
+.HamsterInputSchemas/
+.tmp
+package/
+
+# VueJS
+/Packages/HamsterFileServer/Front/node_modules
+/Packages/HamsterFileServer/Front/dist/*

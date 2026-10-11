@@ -1,0 +1,466 @@
+# 通用配置
+general:
+  enableAppleCloud: false
+  regexOnCopyFile:
+  #    - ^.*[.]userdb.*$
+  #    - ^.*build.*$
+  #    - ^.*SharedSupport.*$
+  #    - ^.*[.]bin$
+  # 内置文本编辑器参数: 是否自动换行
+  textEditorLineWrappingEnabled: true
+
+# 工具栏
+toolbar:
+  # 是否开启工具栏
+  enableToolbar: true
+  # 显示键盘 icon 按钮
+  displayAppIconButton: false
+  # 显示键盘 dissmiss 按钮
+  displayKeyboardDismissButton: true
+  # 工具栏总高度
+  heightOfToolbar: 40
+  # 拼写区高度(剩余高度由候选文字占用)
+  heightOfCodingArea: 10
+  # 拼写区字体大小
+  codingAreaFontSize: 12
+  # 候选文字索引字体大小
+  candidateLabelFontSize: 12
+  # 候选文字字体大小
+  candidateWordFontSize: 18
+  # 候选文字备注信息字体大小。
+  # 对应 rime 候选字的 comment 信息
+  candidateCommentFontSize: 12
+  # 是否显示候选文字索引
+  displayIndexOfCandidateWord: false
+  # 是否显示候选文字 Comment 信息
+  displayCommentOfCandidateWord: false
+  # 划动分页开关，默认为 true，
+  # 关闭后为手动分页模式，即通过发送上一页/下一页按键，使 rime 翻页
+  swipePaging: true
+
+# 键盘相关配置
+keyboard:
+  # 使用键盘类型:
+  # chinese: 中文26键
+  # chineseNineGrid: 中文九宫格
+  # custom(name): 自定义键盘，其中 name 对应自定义键盘配置(customizeKeyboards)中的 name。如: custom(中文26键)
+  useKeyboardType: chinese
+  # 关闭划动文本显示
+  disableSwipeLabel: false
+  # 上下显示划动文本不规则布局
+  swipeLabelUpAndDownIrregularLayout: false
+  # 上下显示划动文本规则布局
+  swipeLabelUpAndDownLayout: false
+  # 上划显示到左侧
+  upSwipeOnLeft: true
+  # 显示按键气泡
+  displayButtonBubbles: true
+  # 启用按键声
+  enableKeySounds: true
+  # 启用触控反馈
+  enableHapticFeedback: true
+  # 反馈强度
+  hapticFeedbackIntensity: 3
+  # 启用分号按键
+  displaySemicolonButton: false
+  # 输入时 Shift 动态变为分号键
+  enableDynamicShiftSemicolon: true
+  # 自定义按键行高度
+  keyboardRowHeight: 58
+  # 启用符号按键
+  displayClassifySymbolButton: true
+  # 启用空格左侧按键
+  displaySpaceLeftButton: true
+  spaceLeftButtonProcessByRIME: true
+  keyValueOfSpaceLeftButton: "，"
+  # 启用空格右侧按键
+  displaySpaceRightButton: false
+  spaceRightButtonProcessByRIME: true
+  keyValueOfSpaceRightButton: "."
+  # 启用中英切换按键
+  displayChineseEnglishSwitchButton: true
+  # 按键位于空格左侧
+  chineseEnglishSwitchButtonIsOnLeftOfSpaceButton: false
+  # 启用数字九宫格键盘
+  enableNineGridOfNumericKeyboard: true
+  # 数字九宫格键盘：数字键是否由 RIME 处理
+  numberKeyProcessByRimeOnNineGridOfNumericKeyboard: false
+  # 数字九宫格键盘：左侧符号列表符号是否由 RIME 处理
+  leftSymbolProcessByRimeOnNineGridOfNumericKeyboard: false
+  # 数字九宫格键盘：键盘右侧符号是否由 RIME 处理
+  rightSymbolProcessByRimeOnNineGridOfNumericKeyboard: false
+
+  symbolsOfGridOfNumericKeyboard:
+    - +
+    - "-"
+    - "*"
+    - /
+  lockShiftState: true
+  enableEmbeddedInputMode: true
+  widthOfOneHandedKeyboard: 80
+  symbolsOfCursorBack: []
+  symbolsOfReturnToMainKeyboard:
+    - "，"
+    - "。"
+    - "！"
+  symbolsOfChineseNineGridKeyboard:
+    - "，"
+    - "。"
+    - "？"
+    - "！"
+    - "…"
+    - "~"
+    - "'"
+    - "、"
+  pairsOfSymbols: []
+  enableSymbolKeyboard: true
+  lockForSymbolKeyboard: false
+
+  # 是否启用空格加载文本
+  enableLoadingTextForSpaceButton: true
+
+  # 空格按钮加载文本
+  loadingTextForSpaceButton: ""
+
+  # 空格按钮长显文本
+  labelTextForSpaceButton: ""
+
+  # 空格按钮长显为当前输入方案
+  # 当开启此选项后，labelForSpaceButton 设置的值无效
+  showCurrentInputSchemaNameForSpaceButton: false
+
+  # 空格按钮加载文字显示当前输入方案
+  # 当开启此选项后， loadingTextForSpaceButton 设置的值无效
+  showCurrentInputSchemaNameOnLoadingTextForSpaceButton: false
+
+  # 是否启用配色方案
+  enableColorSchema: false
+  # 浅色模式下配色
+  useColorSchemaForLight: ""
+  # 暗色模式下配色
+  useColorSchemaForDark: ""
+
+  # 中文26键显示大写字符
+  showUppercasedCharacterOnChineseKeyboard: false
+
+  # 按键下方边框
+  enableButtonUnderBorder: true
+
+  # 配色方案
+  # 来源: https://github.com/rime/squirrel/blob/master/data/squirrel.yaml
+  colorSchemas:
+    - schemaName: solarized_dark
+      name: 曬經・月／Solarized Dark
+      author: 雪齋 <lyc20041@gmail.com>/Morse <morse.hsiao@gmail.com>
+      back_color: 0xF0352A0A
+      button_back_color: 0xF0352A0A
+      button_pressed_back_color: 0x403516
+      button_front_color: 0x7389FF
+      button_pressed_front_color: 0x7389FF
+      button_swipe_front_color: 0x7389FF
+      corner_radius: 5
+      border_color: 0x2A1F00
+      text_color: 0x756E5D
+      hilited_candidate_back_color: 0x403516
+      hilited_candidate_text_color: 0x989F52
+      hilited_comment_text_color: 0x289989
+      hilited_candidate_label_color: 0xCC8947
+      candidate_text_color: 0x7389FF
+      comment_text_color: 0xC38AFF
+      label_color: 0x478DF4
+    - schemaName: solarized_light
+      name: 曬經・日／Solarized Light
+      author: 雪齋 <lyc20041@gmail.com>/Morse <morse.hsiao@gmail.com>
+      back_color: 0xF0E5F6FB
+      button_back_color: 0xF0E5F6FB
+      button_pressed_back_color: 0xD7E8ED
+      button_front_color: 0x595E00
+      button_pressed_front_color: 0x595E00
+      button_swipe_front_color: 0x595E00
+      corner_radius: 5
+      border_color: 0xEDFFFF
+      text_color: 0xA1A095
+      hilited_candidate_back_color: 0xD7E8ED
+      hilited_candidate_text_color: 0x3942CB
+      hilited_comment_text_color: 0x8144C2
+      hilited_candidate_label_color: 0x2566C6
+      candidate_text_color: 0x595E00
+      comment_text_color: 0x005947
+      label_color: 0xA36407
+
+# RIME 引擎相关配置
+rime:
+  maximumNumberOfCandidateWords: 100
+  keyValueOfSwitchSimplifiedAndTraditional: traditionalization
+  # RIME 重新部署时，是否覆盖词库文件
+  # 如果使用自造词，需要改为 false, 否则部署时会覆盖键盘自造词文件
+  overrideDictFiles: true
+  # 覆盖词库文件的正则表达式
+  regexOnOverrideDictFiles:
+    - "^.*[.]userdb.*$"
+    - "^.*[.]txt$"
+  # 拷贝键盘文件至应用沙盒目录的正则表达式
+  regexOnCopyAppGroupDictFile:
+    - "^.*[.]userdb.*$"
+    - "^.*[.]txt$"
+
+# 划动相关配置
+swipe:
+  # 指空格移动多个 point，光标移动一位。所以数字越小越灵敏
+  spaceDragSensitivity: 10
+
+  # 划动距离阈值，当划动的距离大于或等于此值时，才会识别为一次划动
+  distanceThreshold: 20
+
+  # 此值是正切角度的阈值，用来限制上下左右划动时的角度，如果太大容易误触
+  # tan(10º) ≈ 0.176, tan(15º) ≈ 0.268, tan(30º) ≈ 0.577, tan(45º) = 1, tan(60º) ≈ 1.732
+  tangentThreshold: 0.577
+  # 长按延迟时间，只要大于或等于此阈值，才会触发长按 Action，如空格划动
+  longPressDelay: 0.3
+  keyboardSwipe:
+    # 中文九宫格滑动设置
+    - keyboardType: chineseNineGrid
+      keys:
+        - action: chineseNineGrid(@/.)
+          swipe:
+            - direction: up
+              action: character(1)
+              processByRIME: false
+              display: true
+        - action: chineseNineGrid(ABC)
+          swipe:
+            - direction: up
+              action: character(2)
+              processByRIME: false
+              display: true
+        - action: chineseNineGrid(DEF)
+          swipe:
+            - direction: up
+              action: character(3)
+              processByRIME: false
+              display: true
+        - action: chineseNineGrid(GHI)
+          swipe:
+            - direction: up
+              action: character(4)
+              processByRIME: false
+              display: true
+        - action: chineseNineGrid(JKL)
+          swipe:
+            - direction: up
+              action: character(5)
+              processByRIME: false
+              display: true
+        - action: chineseNineGrid(MNO)
+          swipe:
+            - direction: up
+              action: character(6)
+              processByRIME: false
+              display: true
+        - action: chineseNineGrid(PQRS)
+          swipe:
+            - direction: up
+              action: character(7)
+              processByRIME: false
+              display: true
+        - action: chineseNineGrid(TUV)
+          swipe:
+            - direction: up
+              action: character(8)
+              processByRIME: false
+              display: true
+        - action: chineseNineGrid(WXYZ)
+          swipe:
+            - direction: up
+              action: character(9)
+              processByRIME: false
+              display: true
+    # 中文 26 键滑动设置
+    - keyboardType: chinese
+      keys:
+        - action: character(a)
+          swipe:
+            - direction: up
+              action: "character(～)"
+              processByRIME: true
+              display: true
+        - action: character(b)
+          swipe:
+            - direction: up
+              action: "character(！)"
+              processByRIME: false
+              display: true
+        - action: character(c)
+          swipe:
+            - direction: up
+              action: symbol(#)
+              processByRIME: false
+              display: true
+        - action: character(d)
+          swipe:
+            - direction: up
+              action: "character(：)"
+              processByRIME: false
+              display: true
+        - action: character(e)
+          swipe:
+            - direction: up
+              action: character(3)
+              processByRIME: false
+              display: true
+        - action: character(f)
+          swipe:
+            - direction: up
+              action: "character(；)"
+              processByRIME: false
+              display: true
+        - action: character(g)
+          swipe:
+            - direction: up
+              action: "character(（)"
+              processByRIME: false
+              display: true
+        - action: character(h)
+          swipe:
+            - direction: up
+              action: "character(）)"
+              processByRIME: false
+              display: true
+        - action: character(i)
+          swipe:
+            - direction: up
+              action: character(8)
+              processByRIME: false
+              display: true
+        - action: character(j)
+          swipe:
+            - direction: up
+              action: character(@)
+              processByRIME: false
+              display: true
+        - action: character(k)
+          swipe:
+            - direction: up
+              action: "character(“)"
+              processByRIME: false
+              display: true
+        - action: character(l)
+          swipe:
+            - direction: up
+              action: "character(”)"
+              processByRIME: false
+              display: true
+        - action: character(m)
+          swipe:
+            - direction: up
+              action: "character(…)"
+              processByRIME: false
+              display: true
+        - action: character(n)
+          swipe:
+            - direction: up
+              action: character(*)
+              processByRIME: false
+              display: true
+        - action: character(o)
+          swipe:
+            - direction: up
+              action: character(9)
+              processByRIME: false
+              display: true
+        - action: character(p)
+          swipe:
+            - direction: up
+              action: character(0)
+              processByRIME: false
+              display: true
+        - action: character(q)
+          swipe:
+            - direction: up
+              action: character(1)
+              processByRIME: false
+              display: true
+        - action: character(r)
+          swipe:
+            - direction: up
+              action: character(4)
+              processByRIME: false
+              display: true
+        - action: character(s)
+          swipe:
+            - direction: up
+              action: character(/)
+              processByRIME: false
+              display: true
+        - action: character(t)
+          swipe:
+            - direction: up
+              action: character(5)
+              processByRIME: false
+              display: true
+        - action: character(u)
+          swipe:
+            - direction: up
+              action: character(7)
+              processByRIME: false
+              display: true
+        - action: character(v)
+          swipe:
+            - direction: up
+              action: "character(？)"
+              processByRIME: false
+              display: true
+        - action: character(w)
+          swipe:
+            - direction: up
+              action: character(2)
+              processByRIME: false
+              display: true
+        - action: character(x)
+          swipe:
+            - direction: up
+              action: character(_)
+              processByRIME: false
+              display: true
+        - action: character(y)
+          swipe:
+            - direction: up
+              action: character(6)
+              processByRIME: false
+              display: true
+        - action: character(z)
+          swipe:
+            - direction: up
+              action: character(-)
+              processByRIME: false
+              display: true
+        - action: space
+          swipe:
+            - direction: up
+              action: "shortCommand(#次选上屏)"
+              processByRIME: false
+              display: false
+        - action: enter
+          swipe:
+            - direction: up
+              action: "shortCommand(#换行)"
+              processByRIME: false
+              display: true
+        - action: backspace
+          swipe:
+            - direction: up
+              action: "shortCommand(#重输)"
+              processByRIME: false
+              display: true
+        - action: keyboardType(numericNineGrid)
+          swipe:
+            - direction: up
+              action: "shortCommand(#上个输入方案)"
+              processByRIME: false
+              display: true
+        - action: "character(，)"
+          swipe:
+            - direction: up
+              action: "character(。)"
+              processByRIME: true
+              display: true
