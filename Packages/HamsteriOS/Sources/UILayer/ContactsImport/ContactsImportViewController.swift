@@ -72,7 +72,7 @@ class ContactsImportViewController: NibLessViewController {
   }
 
   private func buildEntries() {
-    guard let _ = charMap.first else { loadCharMap() }
+    if charMap.isEmpty { loadCharMap() }
     entries = []
     missing = []
     for name in names {
