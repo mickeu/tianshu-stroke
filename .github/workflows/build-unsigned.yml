@@ -1,0 +1,49 @@
+name: Build unsigned IPA
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-13
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with: {submodules: true}
+      - name: Install prebuilt RIME frameworks
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 -o /tmp/Frameworks.tgz https://github.com/thomfang/LibrimeKit-iOS/releases/download/v0.2.2/Frameworks.tgz
+          tar -xzf /tmp/Frameworks.tgz -C .
+          test -f Frameworks/librime.xcframework/Info.plist
+      - name: Build schemas
+        shell: bash
+        run: make schema
+      - name: Audit public tree
+        run: |
+          ! git ls-files | grep -E '(^|/)(\.env|.*\.p12|.*\.mobileprovision|.*\.pem|.*\.key)$'
+          ! git ls-files -z | xargs -0 -r grep -IlE 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|gh[pousr]_[A-Za-z0-9_]+' || true
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app
+      - name: Archive without signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild archive -workspace Hamster.xcworkspace -scheme Hamster -sdk iphoneos -configuration Release -archivePath "$RUNNER_TEMP/Hamster.xcarchive" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+          APP=$(find "$RUNNER_TEMP/Hamster.xcarchive/Products/Applications" -maxdepth 1 -name '*.app' -type d -print -quit)
+          test -n "$APP"
+          mkdir -p "$RUNNER_TEMP/Payload"
+          cp -R "$APP" "$RUNNER_TEMP/Payload/"
+          (cd "$RUNNER_TEMP" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/tianshu-unsigned.ipa" Payload)
+          unzip -l tianshu-unsigned.ipa | grep -E 'Payload/.*\.app/|PlugIns/' | head -40
+      - name: Upload IPA and archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: tianshu-unsigned-ipa
+          path: |
+            tianshu-unsigned.ipa
+            ${{ runner.temp }}/Hamster.xcarchive
+          if-no-files-found: error
