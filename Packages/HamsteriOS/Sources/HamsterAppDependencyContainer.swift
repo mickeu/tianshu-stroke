@@ -338,6 +338,10 @@ extension HamsterAppDependencyContainer: SubViewControllerFactory {
     return backupViewController
   }
 
+  func makeContactsImportViewController() -> ContactsImportViewController {
+    ContactsImportViewController(rimeViewModel: rimeViewModel)
+  }
+
   func makeAboutViewController() -> AboutViewController {
     let aboutViewController = AboutViewController(
       aboutViewModelFactory: self,

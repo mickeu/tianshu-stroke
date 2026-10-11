@@ -376,6 +376,10 @@ static RimeLeversApi *get_levers() {
   return rime_get_api()->deploy();
 }
 
+- (BOOL)deploySchemaFile:(NSString *)path {
+  return rime_get_api()->deploy_schema([path UTF8String]);
+}
+
 // 对应lever/下deployment_task
 - (BOOL)runTask:(NSString *)taskName {
   return RimeRunTask([taskName UTF8String]);

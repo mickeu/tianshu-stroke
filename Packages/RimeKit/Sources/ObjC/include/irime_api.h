@@ -42,6 +42,7 @@ typedef uintptr_t RimeSessionId;
 - (BOOL)preBuildAllSchemas;
 - (void)deployerInitialize:(IRimeTraits *)traits;
 - (BOOL)deploy;
+- (BOOL)deploySchemaFile:(NSString *)path;
 
 - (BOOL)runTask:(NSString *)taskName;
 - (BOOL)syncUserData;

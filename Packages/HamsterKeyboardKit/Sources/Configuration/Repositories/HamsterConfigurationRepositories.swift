@@ -25,7 +25,7 @@ public class HamsterConfigurationRepositories {
   /// 加载 hamster.yaml 配置文件
   public func loadFromYAML(_ path: URL) throws -> HamsterConfiguration {
     let data = try Data(contentsOf: path, options: [])
-    return try YAMLDecoder().decode(HamsterConfiguration.self, from: data)
+    return try BuiltinStroke.addingLayout(to: YAMLDecoder().decode(HamsterConfiguration.self, from: data))
   }
 
   /// 加载 hamster.custom.yaml 文件
@@ -101,7 +101,7 @@ public class HamsterConfigurationRepositories {
   /// 注意：这里的配置项是应用当前最新的配置选项，可能会在用户变更某些配置时被修改
   /// 如果需要使用配置项的默认值，需要调用 loadFromUserDefaultsOnDefault() 方法
   public func loadFromUserDefaults() throws -> HamsterConfiguration {
-    try loadConfigFromUserDefaults(key: Self.hamsterConfigurationKey)
+    try BuiltinStroke.addingLayout(to: loadConfigFromUserDefaults(key: Self.hamsterConfigurationKey))
   }
 
   /// 从 UserDefaults 中获取应用默认配置
@@ -143,7 +143,7 @@ public class HamsterConfigurationRepositories {
       configuration = try configuration.merge(with: appConfig, uniquingKeysWith: { _, buildValue in buildValue })
     }
 
-    return configuration
+    return try BuiltinStroke.addingLayout(to: configuration)
   }
 
   /// 清空 UI 交互生成的配置

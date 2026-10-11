@@ -128,6 +128,14 @@ public class SettingsViewModel: ObservableObject {
             self.mainViewModel.subViewSubject.send(.finder)
           }
         ),
+        .init(
+          icon: UIImage(systemName: "person.crop.circle.badge.plus") ?? UIImage(systemName: "person.crop.circle")!,
+          text: "导入通讯录词库",
+          accessoryType: .disclosureIndicator,
+          navigationAction: { [unowned self] in
+            self.mainViewModel.subViewSubject.send(.contactsImport)
+          }
+        ),
       ]),
       SettingSectionModel(title: "键盘相关", items: [
         .init(

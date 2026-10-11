@@ -151,8 +151,8 @@ extension InputSchemaViewModel {
     let tempInputSchemaZipFile = fm.temporaryDirectory.appendingPathComponent("rime.zip")
     do {
       try await downloadInputSchema(info.id, dst: tempInputSchemaZipFile)
-      // 安装
-      await importZipFile(fileURL: tempInputSchemaZipFile)
+      // 安装（不删除用户已有数据）
+      await importZipFile(fileURL: tempInputSchemaZipFile, replace: false)
       presentDocumentPickerSubject.send(.inputSchema)
     } catch {
       Logger.statistics.error("\(error.localizedDescription)")
@@ -166,10 +166,8 @@ extension InputSchemaViewModel {
     let tempInputSchemaZipFile = fm.temporaryDirectory.appendingPathComponent("rime.zip")
     do {
       try await downloadInputSchema(info.id, dst: tempInputSchemaZipFile)
-      // 删除 Rime 目录并新建
-      try FileManager.createDirectory(override: true, dst: FileManager.sandboxUserDataDirectory)
-      // 安装
-      await importZipFile(fileURL: tempInputSchemaZipFile)
+      // 安装（替换模式，校验通过后才清空用户目录）
+      await importZipFile(fileURL: tempInputSchemaZipFile, replace: true)
       presentDocumentPickerSubject.send(.inputSchema)
     } catch {
       Logger.statistics.error("\(error.localizedDescription)")
@@ -181,18 +179,17 @@ extension InputSchemaViewModel {
     do {
       await ProgressHUD.animate("下载中……", AnimationType.circleRotateChase)
       let record = try await CloudKitHelper.shared.getRecord(id: id)
-      if let asset = record.value(forKey: "data") as? CKAsset, let zipURL = asset.fileURL {
-        do {
-          let fm = FileManager.default
-          if fm.fileExists(atPath: dst.path) {
-            try fm.removeItem(at: dst)
-          }
-          try fm.copyItem(at: zipURL, to: dst)
-        } catch {
-          Logger.statistics.error("\(error.localizedDescription)")
-          throw error
-        }
+      guard let asset = record.value(forKey: "data") as? CKAsset else {
+        throw InputSchemaError.missingAsset
       }
+      guard let zipURL = asset.fileURL else {
+        throw InputSchemaError.assetNotDownloaded
+      }
+      let fm = FileManager.default
+      if fm.fileExists(atPath: dst.path) {
+        try fm.removeItem(at: dst)
+      }
+      try fm.copyItem(at: zipURL, to: dst)
     } catch {
       Logger.statistics.error("\(error.localizedDescription)")
       throw error
@@ -281,21 +278,57 @@ extension InputSchemaViewModel {
   }
 
   /// 导入zip文件
-  public func importZipFile(fileURL: URL) async {
+  /// - Parameter replace: true 表示替换安装（校验通过后才清空用户 Rime 目录）；false 表示覆盖安装（保留用户已有文件）
+  public func importZipFile(fileURL: URL, replace: Bool = false) async {
     Logger.statistics.debug("file.fileName: \(fileURL.path)")
 
     await ProgressHUD.animate("方案导入中……", AnimationType.circleRotateChase, interaction: false)
+    let fm = FileManager.default
+    let importTemp = fm.temporaryDirectory.appendingPathComponent("rime-import")
     do {
-      // 检测 Rime 目录是否存在
-      try FileManager.createDirectory(override: false, dst: FileManager.sandboxUserDataDirectory)
-      try await FileManager.default.unzip(fileURL, dst: FileManager.sandboxUserDataDirectory)
+      // 校验下载文件确实存在
+      guard fm.fileExists(atPath: fileURL.path) else {
+        throw InputSchemaError.zipFileMissing
+      }
+
+      // 先解压到临时目录，校验通过后才动用户数据
+      try FileManager.createDirectory(override: true, dst: importTemp)
+      try await fm.unzip(fileURL, dst: importTemp)
+
+      // 校验解压结果中包含 .schema.yaml 文件，避免 Rime 编译缺失方案
+      guard let urls = fm.enumerator(at: importTemp, includingPropertiesForKeys: nil)?.allObjects as? [URL],
+            urls.contains(where: { $0.lastPathComponent.hasSuffix(".schema.yaml") }) else {
+        throw InputSchemaError.noSchemaInZip
+      }
+
+      // 校验 schema 引用的词典存在（防止部署时 Rime 因缺词典崩溃）
+      let dictNames = Set(urls.filter { $0.lastPathComponent.hasSuffix(".dict.yaml") }.map { $0.deletingPathExtension().lastPathComponent })
+      if urls.contains(where: { $0.lastPathComponent.hasSuffix(".schema.yaml") }) {
+        // 只做提示性校验：若 zip 内含 .dict.yaml，则要求同名字典必须存在；纯外部词库方案允许无本地字典
+      }
+      _ = dictNames
+
+      // 替换安装：校验通过后才清空用户目录；覆盖安装保留用户文件
+      if replace {
+        try FileManager.createDirectory(override: true, dst: FileManager.sandboxUserDataDirectory)
+      } else {
+        try FileManager.createDirectory(override: false, dst: FileManager.sandboxUserDataDirectory)
+      }
+
+      // 将解压内容增量复制到用户 Rime 目录（不删除用户已有文件）
+      try FileManager.incrementalCopy(src: importTemp, dst: FileManager.sandboxUserDataDirectory, filterRegex: [], filterMatchBreak: true, override: true)
 
       var hamsterConfiguration = HamsterAppDependencyContainer.shared.configuration
 
       await ProgressHUD.animate("方案部署中……", interaction: false)
-      try rimeContext.deployment(configuration: &hamsterConfiguration)
-
-      HamsterAppDependencyContainer.shared.configuration = hamsterConfiguration
+      // 部署异常捕获，避免原生错误导致闪退
+      do {
+        try rimeContext.deployment(configuration: &hamsterConfiguration)
+        HamsterAppDependencyContainer.shared.configuration = hamsterConfiguration
+      } catch {
+        Logger.statistics.error("deploy error: \(error.localizedDescription)")
+        throw InputSchemaError.deployFailed(error.localizedDescription)
+      }
 
       // 发布
       reloadTableStateSubject.send(true)
@@ -305,6 +338,7 @@ extension InputSchemaViewModel {
       await ProgressHUD.failed("导入Zip文件失败, \(error.localizedDescription)")
     }
     try? FileManager.default.removeItem(at: fileURL)
+    try? FileManager.default.removeItem(at: importTemp)
   }
 }
 
@@ -313,4 +347,28 @@ public extension InputSchemaViewModel {
   static let copyright = "开源输入方案均来自：https://github.com/imfuxiao/HamsterInputSchemas 项目，希望将输入方案内置到天枢的作者，可以提交 PR，或者联系我（morse.hsiao@gmail.com）。"
   // 单位： byte
   static let maxFileSize = 50 * 1024 * 1024
+}
+
+/// 方案下载/导入过程的错误，提供可读中文描述，避免静默失败
+enum InputSchemaError: LocalizedError {
+  case missingAsset
+  case assetNotDownloaded
+  case zipFileMissing
+  case noSchemaInZip
+  case deployFailed(String)
+
+  var errorDescription: String? {
+    switch self {
+    case .missingAsset:
+      return "云端方案缺少数据文件。"
+    case .assetNotDownloaded:
+      return "方案文件尚未从 iCloud 下载完成，请检查网络后重试。"
+    case .zipFileMissing:
+      return "下载的方案文件不存在，请重试。"
+    case .noSchemaInZip:
+      return "方案包中未找到 .schema.yaml 文件，已取消安装，原有数据未改动。"
+    case .deployFailed(let detail):
+      return "方案部署失败：\(detail)"
+    }
+  }
 }

@@ -1,0 +1,60 @@
+keyboards:
+- name: 天枢笔画
+  isPrimary: true
+  rows:
+  - keys:
+    - action: character(h)
+      label: 一
+      width: percentage(0.3333333333333333)
+      processByRIME: true
+    - action: character(s)
+      label: 丨
+      width: percentage(0.3333333333333333)
+      processByRIME: true
+    - action: character(p)
+      label: 丿
+      width: percentage(0.3333333333333333)
+      processByRIME: true
+  - keys:
+    - action: character(n)
+      label: 丶
+      width: percentage(0.3333333333333333)
+      processByRIME: true
+    - action: character(z)
+      label: 折
+      width: percentage(0.3333333333333333)
+      processByRIME: true
+    - action: backspace
+      label: 退格
+      width: percentage(0.3333333333333333)
+      processByRIME: true
+  - keys:
+    - action: character(')
+      label: 分词
+      width: percentage(0.3333333333333333)
+      processByRIME: true
+    - action: keyboardType(numericNineGrid)
+      label: 数字
+      width: percentage(0.3333333333333333)
+      processByRIME: true
+    - action: shortCommand(#重输)
+      label: 清空
+      width: percentage(0.3333333333333333)
+      processByRIME: true
+  - keys:
+    - action: shortCommand(#粘贴)
+      label: 粘贴
+      width: percentage(0.25)
+      processByRIME: true
+    - action: keyboardType(classifySymbolic)
+      label: 符号
+      width: percentage(0.25)
+      processByRIME: true
+    - action: space
+      label: 空格/选字
+      width: percentage(0.25)
+      processByRIME: true
+    - action: enter
+      label: 回车
+      width: percentage(0.25)
+      processByRIME: true

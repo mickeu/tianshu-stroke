@@ -92,6 +92,9 @@ popd > /dev/null
 mkdir -p $CI_PRIMARY_REPOSITORY_PATH/Resources/SharedSupport
 (
   cp $CI_PRIMARY_REPOSITORY_PATH/Resources/SharedSupport/hamster.yaml $DST_PATH
+  # Built-in stroke schema and keyboard layout; never touch user Rime data.
+  cp $CI_PRIMARY_REPOSITORY_PATH/Resources/SharedSupport/hamster-stroke-layout.yaml $DST_PATH
+  cp -R $CI_PRIMARY_REPOSITORY_PATH/Resources/SharedSupport/schemas/hamster_stroke/* $DST_PATH/
   cd $DST_PATH/
   zip -r SharedSupport.zip *
 ) && cp $DST_PATH/SharedSupport.zip $CI_PRIMARY_REPOSITORY_PATH/Resources/SharedSupport/

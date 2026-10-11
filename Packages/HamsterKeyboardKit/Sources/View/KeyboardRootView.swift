@@ -147,6 +147,8 @@ class KeyboardRootView: NibLessView {
   /// 工具栏
   private lazy var toolbarView: UIView = {
     let view = KeyboardToolbarView(appearance: appearance, actionHandler: actionHandler, keyboardContext: keyboardContext, rimeContext: rimeContext)
+    view.onClipboard = { [weak self] in self?.showClipboard() }
+    view.onPhrases = { [weak self] in self?.showPhrases() }
     view.translatesAutoresizingMaskIntoConstraints = false
     return view
   }()
@@ -158,6 +160,47 @@ class KeyboardRootView: NibLessView {
     }
     return standerSystemKeyboard
   }()
+
+  private func showClipboard() {
+    guard !subviews.contains(where: { $0 is ClipboardPanelView }) else { return }
+    let panel = ClipboardPanelView(
+      background: appearance.backgroundStyle.backgroundColor,
+      foreground: appearance.candidateBarStyle.toolbarButtonFrontColor,
+      phrasesOnly: false,
+      fullAccess: { [weak self] in self?.keyboardContext.hasFullAccess ?? false },
+      insert: { [weak self] text in
+        self?.rimeContext.reset()
+        self?.keyboardContext.textDocumentProxy.insertText(text)
+      }
+    )
+    addPanel(panel)
+  }
+
+  private func showPhrases() {
+    guard !subviews.contains(where: { $0 is ClipboardPanelView }) else { return }
+    let panel = ClipboardPanelView(
+      background: appearance.backgroundStyle.backgroundColor,
+      foreground: appearance.candidateBarStyle.toolbarButtonFrontColor,
+      phrasesOnly: true,
+      fullAccess: { [weak self] in self?.keyboardContext.hasFullAccess ?? false },
+      insert: { [weak self] text in
+        self?.rimeContext.reset()
+        self?.keyboardContext.textDocumentProxy.insertText(text)
+      }
+    )
+    addPanel(panel)
+  }
+
+  private func addPanel(_ panel: ClipboardPanelView) {
+    panel.translatesAutoresizingMaskIntoConstraints = false
+    addSubview(panel)
+    NSLayoutConstraint.activate([
+      panel.topAnchor.constraint(equalTo: toolbarView.bottomAnchor),
+      panel.bottomAnchor.constraint(equalTo: bottomAnchor),
+      panel.leadingAnchor.constraint(equalTo: leadingAnchor),
+      panel.trailingAnchor.constraint(equalTo: trailingAnchor)
+    ])
+  }
 
   // MARK: - Initializations
 

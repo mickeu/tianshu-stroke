@@ -223,6 +223,8 @@ public extension RimeContext {
   /// RIME 部署
   /// 注意：仅可用于主 App 调用
   func deployment(configuration: inout HamsterConfiguration) throws {
+    // Built-in stroke files are additive and never overwrite user dictionaries.
+    try? BuiltinStroke.installMissingFiles()
     // Never touch App Group paths before the OS entitlement check.
     _ = try AppGroupAccess.requireContainer()
     // 如果开启 iCloud，则先将 iCloud 下文件增量复制到 Sandbox
@@ -286,6 +288,15 @@ public extension RimeContext {
           ), maintenance: true, fullCheck: true)
         }
       }
+    }
+
+    // Compile the bundled stroke schema independently of the user's schema_list.
+    let strokePath = FileManager.sandboxUserDataDirectory.appendingPathComponent("hamster_stroke_test.schema.yaml").path
+    guard Rime.shared.API().deploySchemaFile(strokePath) else {
+      throw NSError(domain: "BuiltinStroke", code: 3, userInfo: [NSLocalizedDescriptionKey: "笔画方案编译失败，请检查Rime配置后重新部署。"])
+    }
+    if !schemas.contains(where: { $0.schemaId == BuiltinStroke.schemaID }) {
+      schemas.append(RimeSchema(schemaId: BuiltinStroke.schemaID, schemaName: "天枢笔画"))
     }
 
     // 提前在部署阶段加载 RimeSwitch hotKey, 此步骤放在键盘启动阶段会减慢启动速度

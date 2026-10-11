@@ -14,6 +14,9 @@ public enum SettingsSubView: String {
   
   /// 输入方案上传页面
   case uploadInputSchema
+
+  /// 通讯录词库导入页面
+  case contactsImport
   
   /// 文件管理页面
   case finder

@@ -19,6 +19,7 @@ protocol SubViewControllerFactory {
   func makeUploadInputSchemaViewController() -> UploadInputSchemaViewController
   func makeAppleCloudViewController() -> AppleCloudViewController
   func makeBackupViewController() -> BackupViewController
+  func makeContactsImportViewController() -> ContactsImportViewController
   func makeAboutViewController() -> AboutViewController
   func makeRimeViewController() -> RimeViewController
 }
@@ -51,6 +52,9 @@ open class MainViewController: UISplitViewController {
 
   private lazy var backupViewController: BackupViewController
     = subViewControllerFactory.makeBackupViewController()
+
+  private lazy var contactsImportViewController: ContactsImportViewController
+    = subViewControllerFactory.makeContactsImportViewController()
 
   private lazy var iCloudViewController: AppleCloudViewController
     = subViewControllerFactory.makeAppleCloudViewController()
@@ -155,6 +159,8 @@ extension MainViewController {
       presentRimeViewController()
     case .backup:
       presentBackupViewController()
+    case .contactsImport:
+      presentContactsImportViewController()
     case .iCloud:
       presentAppleCloudViewController()
     case .about:
@@ -200,6 +206,10 @@ extension MainViewController {
 
   func presentBackupViewController() {
     presentViewController(backupViewController)
+  }
+
+  func presentContactsImportViewController() {
+    presentViewController(contactsImportViewController)
   }
 
   func presentAppleCloudViewController() {

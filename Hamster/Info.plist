@@ -33,6 +33,8 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSContactsUsageDescription</key>
+	<string>用于读取联系人姓名，生成本地笔画输入词库。不读取电话、邮箱、头像、备注等字段，不上传。</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.xuanqi.liu.TianShu</key>

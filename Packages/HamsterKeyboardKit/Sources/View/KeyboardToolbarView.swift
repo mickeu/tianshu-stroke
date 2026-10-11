@@ -8,6 +8,7 @@
 import Combine
 import HamsterKit
 import HamsterUIKit
+import QuartzCore
 import UIKit
 
 /**
@@ -15,7 +16,7 @@ import UIKit
 
  用于显示：
  1. 候选文字，包含横向部分文字显示及下拉显示全部文字
- 2. 常用功能视图
+ 2. 常用功能视图（仅在无候选词时显示）
  */
 class KeyboardToolbarView: NibLessView {
   private let appearance: KeyboardAppearance
@@ -27,19 +28,16 @@ class KeyboardToolbarView: NibLessView {
   private var oldBounds: CGRect = .zero
   private var subscriptions = Set<AnyCancellable>()
 
-  /// 常用功能项: 天枢App
+  /// 常用功能项: 天枢App（同时作为快捷设置入口）
   lazy var iconButton: UIButton = {
-    let button = UIButton(type: .custom)
+    let button = UIButton(type: .system)
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setImage(UIImage(systemName: "r.circle"), for: .normal)
+    button.setImage(UIImage(systemName: "gearshape"), for: .normal)
     button.setPreferredSymbolConfiguration(.init(font: .systemFont(ofSize: 18), scale: .default), forImageIn: .normal)
     button.tintColor = style.toolbarButtonFrontColor
     button.backgroundColor = style.toolbarButtonBackgroundColor
-    button.addTarget(self, action: #selector(openHamsterAppTouchDownAction), for: .touchDown)
-    button.addTarget(self, action: #selector(openHamsterAppTouchUpAction), for: .touchUpInside)
-    button.addTarget(self, action: #selector(touchCancel), for: .touchCancel)
-    button.addTarget(self, action: #selector(touchCancel), for: .touchUpOutside)
-
+    button.accessibilityLabel = "快捷设置"
+    button.showsMenuAsPrimaryAction = true
     return button
   }()
 
@@ -57,6 +55,78 @@ class KeyboardToolbarView: NibLessView {
     button.addTarget(self, action: #selector(touchCancel), for: .touchUpOutside)
     return button
   }()
+
+  var onClipboard: (() -> Void)?
+  var onPhrases: (() -> Void)?
+
+  private lazy var cursorButton: UIButton = {
+    let b = UIButton(type: .system)
+    b.setImage(UIImage(systemName: "arrow.left.and.right"), for: .normal)
+    b.setPreferredSymbolConfiguration(.init(font: .systemFont(ofSize: 18), scale: .default), forImageIn: .normal)
+    b.accessibilityLabel = "移动光标，按住左右拖动"
+    b.addTarget(self, action: #selector(cursorTapped), for: .touchUpInside)
+    let pan = UIPanGestureRecognizer(target: self, action: #selector(dragCursor(_:)))
+    b.addGestureRecognizer(pan)
+    return b
+  }()
+
+  private lazy var phrasesButton: UIButton = {
+    let b = UIButton(type: .system)
+    b.setImage(UIImage(systemName: "text.bubble"), for: .normal)
+    b.setPreferredSymbolConfiguration(.init(font: .systemFont(ofSize: 18), scale: .default), forImageIn: .normal)
+    b.accessibilityLabel = "常用语"
+    b.addTarget(self, action: #selector(openPhrases), for: .touchUpInside)
+    return b
+  }()
+
+  private lazy var clipboardButton: UIButton = {
+    let button = UIButton(type: .system)
+    button.setImage(UIImage(systemName: "doc.on.clipboard"), for: .normal)
+    button.setPreferredSymbolConfiguration(.init(font: .systemFont(ofSize: 18), scale: .default), forImageIn: .normal)
+    button.accessibilityLabel = "剪贴板历史"
+    button.addTarget(self, action: #selector(openClipboard), for: .touchUpInside)
+    return button
+  }()
+
+  private var lastCursorTime: CFTimeInterval = 0
+  private var composing = false
+
+  private func visible(_ key: String) -> Bool { UserDefaults.standard.object(forKey: key) as? Bool ?? true }
+
+  private func refreshEntrances() {
+    clipboardButton.isHidden = !visible("tianshu.showClipboard")
+    phrasesButton.isHidden = !visible("tianshu.showPhrases")
+    cursorButton.isHidden = !visible("tianshu.showCursor")
+
+    let toggles = [("显示常用语", "tianshu.showPhrases"), ("显示剪贴板", "tianshu.showClipboard"), ("显示光标移动入口", "tianshu.showCursor")].map { title, key in
+      UIAction(title: title, state: self.visible(key) ? .on : .off) { [weak self] _ in
+        guard let self else { return }
+        UserDefaults.standard.set(!self.visible(key), forKey: key)
+        self.refreshEntrances()
+      }
+    }
+    iconButton.menu = UIMenu(children: toggles + [UIAction(title: "打开天枢主App") { [weak self] _ in
+      self?.actionHandler.handle(.release, on: .url(URL(string: "hamster://dev.fuxiao.app.hamster/main"), id: "openHamster"))
+    }])
+  }
+
+  @objc private func openClipboard() { onClipboard?() }
+  @objc private func openPhrases() { onPhrases?() }
+
+  @objc private func cursorTapped() {
+    UIAccessibility.post(notification: .announcement, argument: composing ? "组字期间暂不能移动光标" : "按住光标图标左右拖动，可移动文本输入光标")
+  }
+
+  @objc private func dragCursor(_ gesture: UIPanGestureRecognizer) {
+    guard !composing else { gesture.setTranslation(.zero, in: cursorButton); return }
+    guard gesture.state == .changed else { gesture.setTranslation(.zero, in: cursorButton); return }
+    let delta = gesture.translation(in: cursorButton).x
+    let now = CACurrentMediaTime()
+    guard abs(delta) >= 12, now - lastCursorTime >= 0.045 else { return }
+    keyboardContext.textDocumentProxy.adjustTextPosition(byCharacterOffset: delta > 0 ? 1 : -1)
+    lastCursorTime = now
+    gesture.setTranslation(.zero, in: cursorButton)
+  }
 
   // TODO: 常用功能栏
   lazy var commonFunctionBar: UIView = {
@@ -81,14 +151,13 @@ class KeyboardToolbarView: NibLessView {
     self.actionHandler = actionHandler
     self.keyboardContext = keyboardContext
     self.rimeContext = rimeContext
-    // KeyboardToolbarView 为 candidateBarStyle 样式根节点, 这里生成一次，减少计算次数
     self.style = appearance.candidateBarStyle
     self.userInterfaceStyle = keyboardContext.colorScheme
 
     super.init(frame: .zero)
 
     setupSubview()
-
+    refreshEntrances()
     combine()
   }
 
@@ -110,9 +179,10 @@ class KeyboardToolbarView: NibLessView {
 
   override func constructViewHierarchy() {
     addSubview(commonFunctionBar)
-    if keyboardContext.displayAppIconButton {
-      commonFunctionBar.addSubview(iconButton)
-    }
+    commonFunctionBar.addSubview(iconButton)
+    commonFunctionBar.addSubview(phrasesButton)
+    commonFunctionBar.addSubview(clipboardButton)
+    commonFunctionBar.addSubview(cursorButton)
     if keyboardContext.displayKeyboardDismissButton {
       commonFunctionBar.addSubview(dismissKeyboardButton)
     }
@@ -124,17 +194,31 @@ class KeyboardToolbarView: NibLessView {
       commonFunctionBar.bottomAnchor.constraint(equalTo: bottomAnchor),
       commonFunctionBar.leadingAnchor.constraint(equalTo: leadingAnchor),
       commonFunctionBar.trailingAnchor.constraint(equalTo: trailingAnchor),
-    ]
 
-    if keyboardContext.displayAppIconButton {
-      constraints.append(contentsOf: [
-        iconButton.leadingAnchor.constraint(equalTo: commonFunctionBar.leadingAnchor),
-        iconButton.heightAnchor.constraint(equalTo: iconButton.widthAnchor),
-        iconButton.topAnchor.constraint(lessThanOrEqualTo: commonFunctionBar.topAnchor),
-        commonFunctionBar.bottomAnchor.constraint(greaterThanOrEqualTo: iconButton.bottomAnchor),
-        iconButton.centerYAnchor.constraint(equalTo: commonFunctionBar.centerYAnchor),
-      ])
-    }
+      iconButton.leadingAnchor.constraint(equalTo: commonFunctionBar.leadingAnchor),
+      iconButton.centerYAnchor.constraint(equalTo: commonFunctionBar.centerYAnchor),
+      iconButton.heightAnchor.constraint(equalTo: iconButton.widthAnchor),
+      iconButton.topAnchor.constraint(greaterThanOrEqualTo: commonFunctionBar.topAnchor),
+      commonFunctionBar.bottomAnchor.constraint(greaterThanOrEqualTo: iconButton.bottomAnchor),
+
+      phrasesButton.leadingAnchor.constraint(equalTo: iconButton.trailingAnchor, constant: 12),
+      phrasesButton.centerYAnchor.constraint(equalTo: commonFunctionBar.centerYAnchor),
+      phrasesButton.heightAnchor.constraint(equalTo: phrasesButton.widthAnchor),
+      phrasesButton.topAnchor.constraint(greaterThanOrEqualTo: commonFunctionBar.topAnchor),
+      commonFunctionBar.bottomAnchor.constraint(greaterThanOrEqualTo: phrasesButton.bottomAnchor),
+
+      clipboardButton.leadingAnchor.constraint(equalTo: phrasesButton.trailingAnchor, constant: 12),
+      clipboardButton.centerYAnchor.constraint(equalTo: commonFunctionBar.centerYAnchor),
+      clipboardButton.heightAnchor.constraint(equalTo: clipboardButton.widthAnchor),
+      clipboardButton.topAnchor.constraint(greaterThanOrEqualTo: commonFunctionBar.topAnchor),
+      commonFunctionBar.bottomAnchor.constraint(greaterThanOrEqualTo: clipboardButton.bottomAnchor),
+
+      cursorButton.leadingAnchor.constraint(equalTo: clipboardButton.trailingAnchor, constant: 12),
+      cursorButton.centerYAnchor.constraint(equalTo: commonFunctionBar.centerYAnchor),
+      cursorButton.heightAnchor.constraint(equalTo: cursorButton.widthAnchor),
+      cursorButton.topAnchor.constraint(greaterThanOrEqualTo: commonFunctionBar.topAnchor),
+      commonFunctionBar.bottomAnchor.constraint(greaterThanOrEqualTo: cursorButton.bottomAnchor),
+    ]
 
     if keyboardContext.displayKeyboardDismissButton {
       constraints.append(contentsOf: [
@@ -151,9 +235,13 @@ class KeyboardToolbarView: NibLessView {
 
   override func setupAppearance() {
     self.style = appearance.candidateBarStyle
-    if keyboardContext.displayAppIconButton {
-      iconButton.tintColor = style.toolbarButtonFrontColor
-    }
+    clipboardButton.tintColor = style.toolbarButtonFrontColor
+    clipboardButton.backgroundColor = style.toolbarButtonBackgroundColor
+    phrasesButton.tintColor = style.toolbarButtonFrontColor
+    phrasesButton.backgroundColor = style.toolbarButtonBackgroundColor
+    cursorButton.tintColor = style.toolbarButtonFrontColor
+    cursorButton.backgroundColor = style.toolbarButtonBackgroundColor
+    iconButton.tintColor = style.toolbarButtonFrontColor
     if keyboardContext.displayKeyboardDismissButton {
       dismissKeyboardButton.tintColor = style.toolbarButtonFrontColor
     }
@@ -165,23 +253,31 @@ class KeyboardToolbarView: NibLessView {
       .sink { [weak self] in
         guard let self = self else { return }
         let isEmpty = $0.isEmpty
-        self.commonFunctionBar.isHidden = !isEmpty
-        self.candidateBarView.isHidden = isEmpty
+        self.composing = !isEmpty
 
         if self.candidateBarView.superview == nil {
-          candidateBarView.setStyle(self.style)
-          addSubview(candidateBarView)
-          candidateBarView.fillSuperview()
+          self.candidateBarView.setStyle(self.style)
+          self.candidateBarView.alpha = 0
+          self.candidateBarView.isHidden = true
+          self.addSubview(self.candidateBarView)
+          self.candidateBarView.fillSuperview()
+        }
+
+        // 候选词出现时隐藏全部功能入口，空闲时按各自开关显示；仅 alpha/hidden 切换，不改变布局
+        UIView.animate(withDuration: 0.12, delay: 0, options: [.beginFromCurrentState, .curveEaseInOut]) {
+          self.commonFunctionBar.alpha = isEmpty ? 1 : 0
+          self.candidateBarView.alpha = isEmpty ? 0 : 1
+        } completion: { _ in
+          self.commonFunctionBar.isHidden = !isEmpty
+          self.candidateBarView.isHidden = isEmpty
         }
 
         // 检测是否启用内嵌编码
-        guard !keyboardContext.enableEmbeddedInputMode else { return }
+        guard !self.keyboardContext.enableEmbeddedInputMode else { return }
         if self.keyboardContext.keyboardType.isChineseNineGrid {
-          // Debug
-          // self.phoneticArea.text = inputKeys + " | " + self.rimeContext.t9UserInputKey
-          candidateBarView.phoneticLabel.text = self.rimeContext.t9UserInputKey
+          self.candidateBarView.phoneticLabel.text = self.rimeContext.t9UserInputKey
         } else {
-          candidateBarView.phoneticLabel.text = $0
+          self.candidateBarView.phoneticLabel.text = $0
         }
       }
       .store(in: &subscriptions)
@@ -196,17 +292,7 @@ class KeyboardToolbarView: NibLessView {
     actionHandler.handle(.release, on: .dismissKeyboard)
   }
 
-  @objc func openHamsterAppTouchDownAction() {
-    iconButton.backgroundColor = style.toolbarButtonPressedBackgroundColor
-  }
-
-  @objc func openHamsterAppTouchUpAction() {
-    iconButton.backgroundColor = style.toolbarButtonPressedBackgroundColor
-    actionHandler.handle(.release, on: .url(URL(string: "hamster://dev.fuxiao.app.hamster/main"), id: "openHamster"))
-  }
-
   @objc func touchCancel() {
     dismissKeyboardButton.backgroundColor = style.toolbarButtonBackgroundColor
-    iconButton.backgroundColor = style.toolbarButtonBackgroundColor
   }
 }
