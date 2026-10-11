@@ -21,7 +21,7 @@ keyboards:
       width: percentage(0.3333333333333333)
       processByRIME: true
     - action: character(z)
-      label: 折
+      label: 𠃍
       width: percentage(0.3333333333333333)
       processByRIME: true
     - action: backspace

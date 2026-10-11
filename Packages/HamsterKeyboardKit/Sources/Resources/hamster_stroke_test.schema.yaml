@@ -2,7 +2,7 @@ schema:
   schema_id: hamster_stroke_test
   name: 五笔画·试验
   version: '0.1'
-  description: 一丨丿丶折 = h s p n z；分词为手动字界；无通配
+  description: 一丨丿丶𠃍 = h s p n z；分词为手动字界；无通配
 switches:
 - name: ascii_mode
   reset: 0
@@ -34,9 +34,9 @@ translator:
   enable_sentence: true
   enable_completion: true
   preedit_format:
-  - xlit/hspnz/一丨丿丶折/
+  - xlit/hspnz/一丨丿丶𠃍/
   comment_format:
-  - xlit/hspnz/一丨丿丶折/
+  - xlit/hspnz/一丨丿丶𠃍/
 key_binder:
   bindings:
   - when: composing
