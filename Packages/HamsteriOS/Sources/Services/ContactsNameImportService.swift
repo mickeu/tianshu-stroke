@@ -13,7 +13,7 @@ public enum ContactsNameImportService {
       return Result(names: [], denied: true)
     }
     let keys: [CNKeyDescriptor] = [CNContactGivenNameKey as CNKeyDescriptor, CNContactFamilyNameKey as CNKeyDescriptor]
-    let request = CNFetchRequest<CNContact>(keysToFetch: keys)
+    let request = CNContactFetchRequest(keysToFetch: keys)
     var names = Set<String>()
     try store.enumerateContacts(with: request) { contact, _ in
       let name = (contact.familyName + contact.givenName).trimmingCharacters(in: .whitespacesAndNewlines)
