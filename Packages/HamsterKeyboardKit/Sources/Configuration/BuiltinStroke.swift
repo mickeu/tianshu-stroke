@@ -5,7 +5,7 @@ import Yams
 /// Additive installation: never rewrites user dictionaries, schema lists or keyboard preference.
 public enum BuiltinStroke {
   public static let name = "天枢笔画"
-  public static let schemaID = "hamster_stroke_test"
+  public static let schemaID = "stroke_bg5cgq"
   public static func addingLayout(to original: HamsterConfiguration) throws -> HamsterConfiguration {
     var config = original
     guard !(config.keyboards ?? []).contains(where: { $0.name == name }) else { return config }
@@ -21,7 +21,7 @@ public enum BuiltinStroke {
     let fm = FileManager.default
     let target = FileManager.sandboxUserDataDirectory
     try fm.createDirectory(at: target, withIntermediateDirectories: true)
-    for name in ["hamster_stroke_test.schema", "hamster_stroke_test.dict", "hamster_stroke_chars.dict", "hamster_stroke_phrases.dict"] {
+    for name in ["stroke_bg5cgq.schema", "stroke_bg5cgq.dict"] {
       let dst = target.appendingPathComponent(name + ".yaml")
       guard !fm.fileExists(atPath: dst.path) else { continue }
       guard let src = Bundle.module.url(forResource: name, withExtension: "yaml") else {

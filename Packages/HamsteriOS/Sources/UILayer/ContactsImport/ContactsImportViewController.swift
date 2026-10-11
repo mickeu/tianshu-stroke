@@ -60,13 +60,13 @@ class ContactsImportViewController: NibLessViewController {
   }
 
   private func loadCharMap() {
-    let url = FileManager.sandboxUserDataDirectory.appendingPathComponent("hamster_stroke_chars.dict.yaml")
+    let url = FileManager.sandboxUserDataDirectory.appendingPathComponent("stroke_bg5cgq.dict.yaml")
     guard let content = try? String(contentsOf: url, encoding: .utf8) else { return }
     var map: [Character: String] = [:]
     for line in content.split(separator: "\n") {
       let parts = line.split(separator: "\t", omittingEmptySubsequences: true)
-      guard parts.count == 2, parts[0].count == 1, let ch = parts[0].first else { continue }
-      map[ch] = String(parts[1])
+      guard parts.count == 2, parts[0].count == 1, !parts[1].contains("?"), let ch = parts[0].first else { continue }
+      if map[ch] == nil { map[ch] = String(parts[1]) }
     }
     charMap = map
   }
@@ -150,15 +150,32 @@ class ContactsImportViewController: NibLessViewController {
     dict += "\n"
     try dict.write(to: dictURL, atomically: true, encoding: .utf8)
 
-    // 2. 在笔画方案词典中追加 import_tables（仅本机沙盒副本）
-    let testDictURL = userData.appendingPathComponent("hamster_stroke_test.dict.yaml")
-    var testContent = try String(contentsOf: testDictURL, encoding: .utf8)
-    if !testContent.contains("hamster_stroke_contacts") {
-      testContent = testContent.replacingOccurrences(
-        of: "  - hamster_stroke_phrases\n",
-        with: "  - hamster_stroke_phrases\n  - hamster_stroke_contacts\n"
-      )
-      try testContent.write(to: testDictURL, atomically: true, encoding: .utf8)
+    // 2. 在 BG5CGQ 笔画方案词典头中追加 import_tables（仅本机沙盒副本）
+    let bgDictURL = userData.appendingPathComponent("stroke_bg5cgq.dict.yaml")
+    var bgContent = try String(contentsOf: bgDictURL, encoding: .utf8)
+    if !bgContent.contains("hamster_stroke_contacts") {
+      if bgContent.contains("import_tables:") {
+        bgContent = bgContent.replacingOccurrences(
+          of: "import_tables:",
+          with: "import_tables:\n  - hamster_stroke_contacts",
+          options: .literal
+        )
+      } else {
+        // 在头部配置块（--- 与 ... 之间）注入 import_tables
+        let lines = bgContent.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        var out: [String] = []
+        var inserted = false
+        for line in lines {
+          out.append(line)
+          if !inserted && line == "use_preset_vocabulary: false" {
+            out.append("import_tables:")
+            out.append("  - hamster_stroke_contacts")
+            inserted = true
+          }
+        }
+        bgContent = out.joined(separator: "\n")
+      }
+      try bgContent.write(to: bgDictURL, atomically: true, encoding: .utf8)
     }
   }
 }

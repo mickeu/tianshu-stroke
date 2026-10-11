@@ -291,7 +291,7 @@ public extension RimeContext {
     }
 
     // Compile the bundled stroke schema independently of the user's schema_list.
-    let strokePath = FileManager.sandboxUserDataDirectory.appendingPathComponent("hamster_stroke_test.schema.yaml").path
+    let strokePath = FileManager.sandboxUserDataDirectory.appendingPathComponent("stroke_bg5cgq.schema.yaml").path
     guard Rime.shared.API().deploySchemaFile(strokePath) else {
       throw NSError(domain: "BuiltinStroke", code: 3, userInfo: [NSLocalizedDescriptionKey: "笔画方案编译失败，请检查Rime配置后重新部署。"])
     }

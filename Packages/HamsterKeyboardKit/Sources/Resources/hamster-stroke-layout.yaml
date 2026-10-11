@@ -3,58 +3,150 @@ keyboards:
   isPrimary: true
   rows:
   - keys:
-    - action: character(h)
+    - action: character(+)
+      label: +
+      width: percentage(0.12)
+      processByRIME: false
+    - action: character(1)
       label: 一
-      width: percentage(0.3333333333333333)
-      processByRIME: true
-    - action: character(s)
+      swipe:
+      - direction: up
+        action: character(1)
+        display: true
+        processByRIME: false
+      - direction: down
+        action: character(@)
+        display: true
+        processByRIME: false
+    - action: character(2)
       label: 丨
-      width: percentage(0.3333333333333333)
-      processByRIME: true
-    - action: character(p)
+      swipe:
+      - direction: up
+        action: character(2)
+        display: true
+        processByRIME: false
+      - direction: down
+        action: character(：)
+        display: true
+        processByRIME: false
+    - action: character(3)
       label: 丿
-      width: percentage(0.3333333333333333)
-      processByRIME: true
-  - keys:
-    - action: character(n)
-      label: 丶
-      width: percentage(0.3333333333333333)
-      processByRIME: true
-    - action: character(z)
-      label: 𠃍
-      width: percentage(0.3333333333333333)
-      processByRIME: true
+      swipe:
+      - direction: up
+        action: character(3)
+        display: true
+        processByRIME: false
+      - direction: down
+        action: character(\)
+        display: true
+        processByRIME: false
     - action: backspace
       label: 退格
-      width: percentage(0.3333333333333333)
-      processByRIME: true
+      width: percentage(0.13)
   - keys:
+    - action: character(*)
+      label: '*'
+      width: percentage(0.12)
+      processByRIME: false
+    - action: character(4)
+      label: 丶
+      swipe:
+      - direction: up
+        action: character(4)
+        display: true
+        processByRIME: false
+      - direction: down
+        action: character(！)
+        display: true
+        processByRIME: false
+    - action: character(5)
+      label: 乛
+      swipe:
+      - direction: up
+        action: character(5)
+        display: true
+        processByRIME: false
+      - direction: down
+        action: character(（)
+        display: true
+        processByRIME: false
     - action: character(')
       label: 分词
-      width: percentage(0.3333333333333333)
-      processByRIME: true
-    - action: keyboardType(numericNineGrid)
-      label: 数字
-      width: percentage(0.3333333333333333)
-      processByRIME: true
-    - action: shortCommand(#重输)
-      label: 清空
-      width: percentage(0.3333333333333333)
-      processByRIME: true
+      swipe:
+      - direction: up
+        action: character(6)
+        display: true
+        processByRIME: false
+      - direction: down
+        action: character(）)
+        display: true
+        processByRIME: false
+    - action: enter
+      label: 换行
+      width: percentage(0.13)
   - keys:
-    - action: shortCommand(#粘贴)
-      label: 粘贴
-      width: percentage(0.25)
-      processByRIME: true
+    - action: character(/)
+      label: /
+      width: percentage(0.12)
+      processByRIME: false
+    - action: character(?)
+      label: 通配
+      swipe:
+      - direction: up
+        action: character(7)
+        display: true
+        processByRIME: false
+      - direction: down
+        action: character(")
+        display: true
+        processByRIME: false
+    - action: character(，)
+      label: ，
+      processByRIME: false
+      swipe:
+      - direction: up
+        action: character(8)
+        display: true
+        processByRIME: false
+      - direction: down
+        action: character(-)
+        display: true
+        processByRIME: false
+    - action: character(。)
+      label: 。
+      processByRIME: false
+      swipe:
+      - direction: up
+        action: character(9)
+        display: true
+        processByRIME: false
+      - direction: down
+        action: character(_)
+        display: true
+        processByRIME: false
     - action: keyboardType(classifySymbolic)
       label: 符号
-      width: percentage(0.25)
-      processByRIME: true
+      width: percentage(0.13)
+      processByRIME: false
+      swipe:
+      - direction: up
+        action: character(0)
+        display: true
+        processByRIME: false
+  - keys:
+    - action: keyboardType(alphabetic)
+      label: 中英
+      width: percentage(0.13)
+      processByRIME: false
+    - action: keyboardType(numericNineGrid)
+      label: '123'
+      width: percentage(0.13)
+      processByRIME: false
     - action: space
-      label: 空格/选字
-      width: percentage(0.25)
+      width: available
+      label:
+        loadingText: BG5CGQ笔画
+        text: 空格
       processByRIME: true
     - action: enter
-      label: 回车
-      width: percentage(0.25)
-      processByRIME: true
+      width: percentage(0.19)
