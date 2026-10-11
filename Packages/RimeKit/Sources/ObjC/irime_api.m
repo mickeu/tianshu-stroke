@@ -417,7 +417,19 @@ static RimeLeversApi *get_levers() {
 }
 
 - (BOOL)replaceInputKeys:(NSString *)keys withStartPos:(int)pos AndCount:(int)length AndSession:(RimeSessionId)session {
-  return RimeReplaceInput(session, pos, length, [keys UTF8String]);
+  RimeApi *api = rime_get_api();
+  if (!RIME_API_AVAILABLE(api, set_input) || pos < 0 || length < 0 || !keys) {
+    return NO;
+  }
+  const char *input = api->get_input(session);
+  const char *replacement = [keys UTF8String];
+  if (!input || !replacement) return NO;
+  size_t inputLength = strlen(input);
+  if ((size_t)pos > inputLength || (size_t)length > inputLength - (size_t)pos) return NO;
+  NSMutableData *updated = [NSMutableData dataWithBytes:input length:(NSUInteger)pos];
+  [updated appendBytes:replacement length:strlen(replacement)];
+  [updated appendBytes:input + pos + length length:inputLength - pos - length + 1];
+  return api->set_input(session, (const char *)updated.bytes);
 }
 
 - (NSArray<IRimeCandidate *> *)getCandidateList:(RimeSessionId)session {

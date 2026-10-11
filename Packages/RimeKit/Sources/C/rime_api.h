@@ -645,8 +645,8 @@ typedef struct rime_api_t {
                                                  const char* option_name,
                                                  Bool state,
                                                  Bool abbreviated);
-  //! modify the current input
-  Bool (*replace_input)(RimeSessionId session_id, size_t pos, size_t count, const char* replace_char);
+  //! Replace the complete input (upstream librime API).
+  Bool (*set_input)(RimeSessionId session_id, const char* input);
 } RimeApi;
 
 //! API entry
@@ -654,6 +654,60 @@ typedef struct rime_api_t {
  *  Acquire the version controlled RimeApi structure.
  */
 RIME_API RimeApi* rime_get_api(void);
+
+/* LibrimeKit exports the versioned API table; route legacy convenience calls
+ * through that table so static linking works with current prebuilt binaries. */
+#define RimeCandidateListBegin(...) rime_get_api()->candidate_list_begin(__VA_ARGS__)
+#define RimeCandidateListEnd(...) rime_get_api()->candidate_list_end(__VA_ARGS__)
+#define RimeCandidateListNext(...) rime_get_api()->candidate_list_next(__VA_ARGS__)
+#define RimeCandidateListFromIndex(...) rime_get_api()->candidate_list_from_index(__VA_ARGS__)
+#define RimeCleanupAllSessions(...) rime_get_api()->cleanup_all_sessions(__VA_ARGS__)
+#define RimeClearComposition(...) rime_get_api()->clear_composition(__VA_ARGS__)
+#define RimeCommitComposition(...) rime_get_api()->commit_composition(__VA_ARGS__)
+#define RimeConfigBeginList(...) rime_get_api()->config_begin_list(__VA_ARGS__)
+#define RimeConfigBeginMap(...) rime_get_api()->config_begin_map(__VA_ARGS__)
+#define RimeConfigClose(...) rime_get_api()->config_close(__VA_ARGS__)
+#define RimeConfigGetBool(...) rime_get_api()->config_get_bool(__VA_ARGS__)
+#define RimeConfigGetCString(...) rime_get_api()->config_get_cstring(__VA_ARGS__)
+#define RimeConfigGetDouble(...) rime_get_api()->config_get_double(__VA_ARGS__)
+#define RimeConfigGetInt(...) rime_get_api()->config_get_int(__VA_ARGS__)
+#define RimeConfigNext(...) rime_get_api()->config_next(__VA_ARGS__)
+#define RimeConfigOpen(...) rime_get_api()->config_open(__VA_ARGS__)
+#define RimeConfigSetInt(...) rime_get_api()->config_set_int(__VA_ARGS__)
+#define RimeConfigEnd(...) rime_get_api()->config_end(__VA_ARGS__)
+#define RimeConfigIteratorNext(...) rime_get_api()->config_next(__VA_ARGS__)
+#define RimeCreateSession(...) rime_get_api()->create_session(__VA_ARGS__)
+#define RimeDestroySession(...) rime_get_api()->destroy_session(__VA_ARGS__)
+#define RimeFindSession(...) rime_get_api()->find_session(__VA_ARGS__)
+#define RimeFreeCommit(...) rime_get_api()->free_commit(__VA_ARGS__)
+#define RimeFreeContext(...) rime_get_api()->free_context(__VA_ARGS__)
+#define RimeFreeSchemaList(...) rime_get_api()->free_schema_list(__VA_ARGS__)
+#define RimeFreeStatus(...) rime_get_api()->free_status(__VA_ARGS__)
+#define RimeGetCommit(...) rime_get_api()->get_commit(__VA_ARGS__)
+#define RimeGetContext(...) rime_get_api()->get_context(__VA_ARGS__)
+#define RimeGetOption(...) rime_get_api()->get_option(__VA_ARGS__)
+#define RimeGetSchemaList(...) rime_get_api()->get_schema_list(__VA_ARGS__)
+#define RimeGetStatus(...) rime_get_api()->get_status(__VA_ARGS__)
+#define RimeInitialize(...) rime_get_api()->initialize(__VA_ARGS__)
+#define RimeFinalize(...) rime_get_api()->finalize(__VA_ARGS__)
+#define RimeProcessKey(...) rime_get_api()->process_key(__VA_ARGS__)
+#define RimeSetup(...) rime_get_api()->setup(__VA_ARGS__)
+#define RimeSetNotificationHandler(...) rime_get_api()->set_notification_handler(__VA_ARGS__)
+#define RimeStartMaintenance(...) rime_get_api()->start_maintenance(__VA_ARGS__)
+#define RimeIsMaintenancing(...) rime_get_api()->is_maintenance_mode(__VA_ARGS__)
+#define RimeJoinMaintenanceThread(...) rime_get_api()->join_maintenance_thread(__VA_ARGS__)
+#define RimeDeployerInitialize(...) rime_get_api()->deployer_initialize(__VA_ARGS__)
+#define RimePrebuildAllSchemas(...) rime_get_api()->prebuild(__VA_ARGS__)
+#define RimeDeployConfigFile(...) rime_get_api()->deploy_config_file(__VA_ARGS__)
+#define RimeFindModule(...) rime_get_api()->find_module(__VA_ARGS__)
+#define RimeRunTask(...) rime_get_api()->run_task(__VA_ARGS__)
+#define RimeSchemaOpen(...) rime_get_api()->schema_open(__VA_ARGS__)
+#define RimeSelectCandidate(...) rime_get_api()->select_candidate(__VA_ARGS__)
+#define RimeSelectSchema(...) rime_get_api()->select_schema(__VA_ARGS__)
+#define RimeSetOption(...) rime_get_api()->set_option(__VA_ARGS__)
+#define RimeSimulateKeySequence(...) rime_get_api()->simulate_key_sequence(__VA_ARGS__)
+#define RimeSyncUserData(...) rime_get_api()->sync_user_data(__VA_ARGS__)
+#define RimeUserConfigOpen(...) rime_get_api()->user_config_open(__VA_ARGS__)
 
 //! Clients should test if an api function is available in the current version
 //! before calling it.
