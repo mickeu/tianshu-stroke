@@ -6,6 +6,7 @@
 //
 
 import Combine
+import HamsterKit
 import HamsterUIKit
 import UIKit
 
@@ -48,8 +49,9 @@ class FinderRootView: NibLessView {
     return FileBrowserView(finderViewModel: finderViewModel, fileBrowserViewModel: fileBrowserViewModel)
   }()
 
-  lazy var appGroupDocumentFileBrowseView: FileBrowserView = {
-    let fileBrowserViewModel = fileBrowserViewModelFactory.makeFileBrowserViewModel(rootURL: FileManager.shareURL)
+  lazy var appGroupDocumentFileBrowseView: UIView = {
+    guard let url = try? FileManager.shareURL else { return AppGroupAccess.diagnosticView() }
+    let fileBrowserViewModel = fileBrowserViewModelFactory.makeFileBrowserViewModel(rootURL: url)
     return FileBrowserView(finderViewModel: finderViewModel, fileBrowserViewModel: fileBrowserViewModel)
   }()
 

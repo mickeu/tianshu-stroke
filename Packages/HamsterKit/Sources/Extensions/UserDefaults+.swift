@@ -12,7 +12,10 @@ import Yams
 /// UserDefault 扩展
 public extension UserDefaults {
   /// AppGroup 共享 UserDefaults
-  static let hamster = UserDefaults(suiteName: HamsterConstants.appGroupName)!
+  static var hamster: UserDefaults? {
+    guard AppGroupAccess.isAvailable else { return nil }
+    return UserDefaults(suiteName: AppGroupAccess.identifier)
+  }
 
   // MARK: - 天枢 1.0 版本相关参数
 
@@ -230,7 +233,7 @@ public extension UserDefaults {
     }
     set {
       if let data = try? JSONEncoder().encode(newValue) {
-        UserDefaults.hamster.set(data, forKey: Self.schemasForKey)
+        UserDefaults.hamster?.set(data, forKey: Self.schemasForKey)
         Logger.statistics.debug("save schemas: \(newValue)")
       }
     }
@@ -248,7 +251,7 @@ public extension UserDefaults {
     }
     set {
       if let data = try? JSONEncoder().encode(newValue) {
-        UserDefaults.hamster.set(data, forKey: Self.selectSchemasForKey)
+        UserDefaults.hamster?.set(data, forKey: Self.selectSchemasForKey)
         Logger.statistics.debug("save selectSchemas: \(newValue)")
       }
     }
@@ -266,7 +269,7 @@ public extension UserDefaults {
     }
     set {
       if let data = try? JSONEncoder().encode(newValue) {
-        UserDefaults.hamster.set(data, forKey: Self.currentSchemaForKey)
+        UserDefaults.hamster?.set(data, forKey: Self.currentSchemaForKey)
         Logger.statistics.debug("save currentSchema: \(data)")
       }
     }
@@ -284,7 +287,7 @@ public extension UserDefaults {
     }
     set {
       if let data = try? JSONEncoder().encode(newValue) {
-        UserDefaults.hamster.set(data, forKey: Self.latestSchemaForKey)
+        UserDefaults.hamster?.set(data, forKey: Self.latestSchemaForKey)
         Logger.statistics.debug("save latestSchema: \(data)")
       }
     }

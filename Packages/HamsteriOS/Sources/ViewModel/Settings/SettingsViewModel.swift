@@ -204,7 +204,7 @@ extension SettingsViewModel {
   /// 启动加载数据
   func loadAppData() async throws {
     // PATCH: 仓1.0版本处理
-    if let v1FirstRunning = UserDefaults.hamster._firstRunningForV1, v1FirstRunning == false {
+    if let v1FirstRunning = UserDefaults.hamster?._firstRunningForV1, v1FirstRunning == false {
       await ProgressHUD.animate("迁移 1.0 配置中……", interaction: false)
 
       var appConfig = HamsterAppDependencyContainer.shared.applicationConfiguration
@@ -223,7 +223,7 @@ extension SettingsViewModel {
       UserDefaults.standard.isFirstRunning = false
 
       /// 删除 V1 标识
-      UserDefaults.hamster._removeFirstRunningForV1()
+      UserDefaults.hamster?._removeFirstRunningForV1()
 
       HamsterAppDependencyContainer.shared.configuration = configuration
       HamsterAppDependencyContainer.shared.applicationConfiguration = appConfig
@@ -267,83 +267,83 @@ extension SettingsViewModel {
 
   /// 仓1.0迁移配置参数
   private func _setupConfigurationForV1Update(configuration: inout HamsterConfiguration) {
-    if let _showKeyPressBubble = UserDefaults.hamster._showKeyPressBubble {
+    if let _showKeyPressBubble = UserDefaults.hamster?._showKeyPressBubble {
       configuration.keyboard?.displayButtonBubbles = _showKeyPressBubble
     }
 
-    if let _enableKeyboardFeedbackSound = UserDefaults.hamster._enableKeyboardFeedbackSound {
+    if let _enableKeyboardFeedbackSound = UserDefaults.hamster?._enableKeyboardFeedbackSound {
       configuration.keyboard?.enableKeySounds = _enableKeyboardFeedbackSound
     }
 
-    if let _enableKeyboardFeedbackHaptic = UserDefaults.hamster._enableKeyboardFeedbackHaptic {
+    if let _enableKeyboardFeedbackHaptic = UserDefaults.hamster?._enableKeyboardFeedbackHaptic {
       configuration.keyboard?.enableHapticFeedback = _enableKeyboardFeedbackHaptic
     }
 
-    if let _showKeyboardDismissButton = UserDefaults.hamster._showKeyboardDismissButton {
+    if let _showKeyboardDismissButton = UserDefaults.hamster?._showKeyboardDismissButton {
       configuration.toolbar?.displayKeyboardDismissButton = _showKeyboardDismissButton
     }
 
-    if let _showSemicolonButton = UserDefaults.hamster._showSemicolonButton {
+    if let _showSemicolonButton = UserDefaults.hamster?._showSemicolonButton {
       configuration.keyboard?.displaySemicolonButton = _showSemicolonButton
     }
 
-    if let _showSpaceLeftButton = UserDefaults.hamster._showSpaceLeftButton {
+    if let _showSpaceLeftButton = UserDefaults.hamster?._showSpaceLeftButton {
       configuration.keyboard?.displaySpaceLeftButton = _showSpaceLeftButton
     }
 
-    if let _spaceLeftButtonValue = UserDefaults.hamster._spaceLeftButtonValue {
+    if let _spaceLeftButtonValue = UserDefaults.hamster?._spaceLeftButtonValue {
       configuration.keyboard?.keyValueOfSpaceLeftButton = _spaceLeftButtonValue
     }
 
-    if let _showSpaceRightButton = UserDefaults.hamster._showSpaceRightButton {
+    if let _showSpaceRightButton = UserDefaults.hamster?._showSpaceRightButton {
       configuration.keyboard?.displaySpaceRightButton = _showSpaceRightButton
     }
 
-    if let _spaceRightButtonValue = UserDefaults.hamster._spaceRightButtonValue {
+    if let _spaceRightButtonValue = UserDefaults.hamster?._spaceRightButtonValue {
       configuration.keyboard?.keyValueOfSpaceRightButton = _spaceRightButtonValue
     }
 
-    if let _showSpaceRightSwitchLanguageButton = UserDefaults.hamster._showSpaceRightSwitchLanguageButton {
+    if let _showSpaceRightSwitchLanguageButton = UserDefaults.hamster?._showSpaceRightSwitchLanguageButton {
       configuration.keyboard?.displayChineseEnglishSwitchButton = _showSpaceRightSwitchLanguageButton
     }
 
-    if let _switchLanguageButtonInSpaceLeft = UserDefaults.hamster._switchLanguageButtonInSpaceLeft {
+    if let _switchLanguageButtonInSpaceLeft = UserDefaults.hamster?._switchLanguageButtonInSpaceLeft {
       configuration.keyboard?.chineseEnglishSwitchButtonIsOnLeftOfSpaceButton = _switchLanguageButtonInSpaceLeft
     }
 
-    if let _rimeMaxCandidateSize = UserDefaults.hamster._rimeMaxCandidateSize {
+    if let _rimeMaxCandidateSize = UserDefaults.hamster?._rimeMaxCandidateSize {
       configuration.rime?.maximumNumberOfCandidateWords = _rimeMaxCandidateSize
     }
 
-    if let _rimeCandidateTitleFontSize = UserDefaults.hamster._rimeCandidateTitleFontSize {
+    if let _rimeCandidateTitleFontSize = UserDefaults.hamster?._rimeCandidateTitleFontSize {
       configuration.toolbar?.candidateWordFontSize = _rimeCandidateTitleFontSize
     }
 
-    if let _rimeCandidateCommentFontSize = UserDefaults.hamster._rimeCandidateCommentFontSize {
+    if let _rimeCandidateCommentFontSize = UserDefaults.hamster?._rimeCandidateCommentFontSize {
       configuration.toolbar?.candidateCommentFontSize = _rimeCandidateCommentFontSize
     }
 
-    if let _candidateBarHeight = UserDefaults.hamster._candidateBarHeight {
+    if let _candidateBarHeight = UserDefaults.hamster?._candidateBarHeight {
       configuration.toolbar?.heightOfToolbar = _candidateBarHeight
     }
 
-    if let _rimeSimplifiedAndTraditionalSwitcherKey = UserDefaults.hamster._rimeSimplifiedAndTraditionalSwitcherKey {
+    if let _rimeSimplifiedAndTraditionalSwitcherKey = UserDefaults.hamster?._rimeSimplifiedAndTraditionalSwitcherKey {
       configuration.rime?.keyValueOfSwitchSimplifiedAndTraditional = _rimeSimplifiedAndTraditionalSwitcherKey
     }
 
-    if let _enableInputEmbeddedMode = UserDefaults.hamster._enableInputEmbeddedMode {
+    if let _enableInputEmbeddedMode = UserDefaults.hamster?._enableInputEmbeddedMode {
       configuration.keyboard?.enableEmbeddedInputMode = _enableInputEmbeddedMode
     }
 
-    if let _enableKeyboardAutomaticallyLowercase = UserDefaults.hamster._enableKeyboardAutomaticallyLowercase {
+    if let _enableKeyboardAutomaticallyLowercase = UserDefaults.hamster?._enableKeyboardAutomaticallyLowercase {
       configuration.keyboard?.lockShiftState = !_enableKeyboardAutomaticallyLowercase
     }
 
-    if let _rimeSimplifiedAndTraditionalSwitcherKey = UserDefaults.hamster._rimeSimplifiedAndTraditionalSwitcherKey {
+    if let _rimeSimplifiedAndTraditionalSwitcherKey = UserDefaults.hamster?._rimeSimplifiedAndTraditionalSwitcherKey {
       configuration.rime?.keyValueOfSwitchSimplifiedAndTraditional = _rimeSimplifiedAndTraditionalSwitcherKey
     }
 
-    if let _keyboardSwipeGestureSymbol = UserDefaults.hamster._keyboardSwipeGestureSymbol {
+    if let _keyboardSwipeGestureSymbol = UserDefaults.hamster?._keyboardSwipeGestureSymbol {
       let translateShortCommand = { (name: String) -> ShortcutCommand? in
         if name.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("#") {
           return ShortcutCommand(rawValue: name)

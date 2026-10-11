@@ -28,6 +28,8 @@ jobs:
         run: make schema
       - name: Audit public tree
         run: python3 ci_scripts/audit_public.py
+      - name: Test App Group access policy
+        run: python3 ci_scripts/test_appgroup.py
       - name: Verify Xcode
         run: xcodebuild -version
       - name: Archive without signing
@@ -39,9 +41,9 @@ jobs:
           test -n "$APP"
           mkdir -p "$RUNNER_TEMP/Payload"
           cp -R "$APP" "$RUNNER_TEMP/Payload/"
-          (cd "$RUNNER_TEMP" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/tianshu-unsigned.ipa" Payload)
-          unzip -tq tianshu-unsigned.ipa
-          unzip -Z1 tianshu-unsigned.ipa > "$RUNNER_TEMP/ipa-files.txt"
+          (cd "$RUNNER_TEMP" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/tianshu-appgroup-fix.ipa" Payload)
+          unzip -tq tianshu-appgroup-fix.ipa
+          unzip -Z1 tianshu-appgroup-fix.ipa > "$RUNNER_TEMP/ipa-files.txt"
           grep -E '^Payload/[^/]+\.app/$' "$RUNNER_TEMP/ipa-files.txt"
           grep -E '^Payload/[^/]+\.app/PlugIns/[^/]+\.appex/$' "$RUNNER_TEMP/ipa-files.txt"
       - name: Upload IPA and archive
@@ -49,6 +51,6 @@ jobs:
         with:
           name: tianshu-unsigned-ipa
           path: |
-            tianshu-unsigned.ipa
+            tianshu-appgroup-fix.ipa
             ${{ runner.temp }}/Hamster.xcarchive
           if-no-files-found: error

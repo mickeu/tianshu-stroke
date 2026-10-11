@@ -252,9 +252,9 @@ public extension FileManager {
   // 注意：AppGroup已变为Keyboard复制方案使用的中转站
   // App内部使用位置在 Document 和 iCloud 下
   static var shareURL: URL {
-    FileManager.default.containerURL(
-      forSecurityApplicationGroupIdentifier: HamsterConstants.appGroupName)!
-      .appendingPathComponent("InputSchema")
+    get throws {
+      try AppGroupAccess.requireContainer().appendingPathComponent("InputSchema")
+    }
   }
 
   static var sandboxDirectory: URL {
@@ -264,26 +264,34 @@ public extension FileManager {
 
   // AppGroup共享下: SharedSupport目录
   static var appGroupSharedSupportDirectoryURL: URL {
-    shareURL.appendingPathComponent(
+    get throws {
+      try shareURL.appendingPathComponent(
       HamsterConstants.rimeSharedSupportPathName, isDirectory: true
     )
+    }
   }
 
   // AppGroup共享下: userData目录
   static var appGroupUserDataDirectoryURL: URL {
-    shareURL.appendingPathComponent(
+    get throws {
+      try shareURL.appendingPathComponent(
       HamsterConstants.rimeUserPathName, isDirectory: true
     )
+    }
   }
 
   // 沙盒 Document 目录下备份目录
   static var appGroupBackupDirectory: URL {
-    shareURL.appendingPathComponent("backups", isDirectory: true)
+    get throws {
+      try shareURL.appendingPathComponent("backups", isDirectory: true)
+    }
   }
 
   // AppGroup共享下：userData目录下: default.custom.yaml文件路径
   static var appGroupUserDataDefaultCustomYaml: URL {
-    appGroupUserDataDirectoryURL.appendingPathComponent("default.custom.yaml")
+    get throws {
+      try appGroupUserDataDirectoryURL.appendingPathComponent("default.custom.yaml")
+    }
   }
 
   // Sandbox下：userData目录下: default.custom.yaml文件路径
@@ -293,7 +301,9 @@ public extension FileManager {
 
   // AppGroup共享下：userData目录下: installation.yaml文件路径
   static var appGroupInstallationYaml: URL {
-    appGroupUserDataDirectoryURL.appendingPathComponent("installation.yaml")
+    get throws {
+      try appGroupUserDataDirectoryURL.appendingPathComponent("installation.yaml")
+    }
   }
 
   // Sandbox下：userData目录下: installation.yaml文件路径
@@ -335,7 +345,9 @@ public extension FileManager {
 
   /// AppGroup/Rime/build/hamster.yaml 文件
   static var hamsterConfigFileOnAppGroupBuild: URL {
-    appGroupUserDataDirectoryURL.appendingPathComponent("/build/hamster.yaml")
+    get throws {
+      try appGroupUserDataDirectoryURL.appendingPathComponent("/build/hamster.yaml")
+    }
   }
 
   // 沙盒 Document 目录下 ShareSupport 目录

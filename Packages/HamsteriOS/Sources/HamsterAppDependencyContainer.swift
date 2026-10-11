@@ -61,11 +61,11 @@ open class HamsterAppDependencyContainer {
           // try HamsterConfigurationRepositories.shared.saveToYAML(config: configuration, path: FileManager.hamsterConfigFileOnBuild)
 //          try HamsterConfigurationRepositories.shared.saveToJSON(
 //            config: configuration,
-//            path: FileManager.appGroupUserDataDirectoryURL.appendingPathComponent("/build/hamster.json")
+//            path: (try FileManager.appGroupUserDataDirectoryURL).appendingPathComponent("/build/hamster.json")
 //          )
           try HamsterConfigurationRepositories.shared.saveToPropertyList(
             config: configuration,
-            path: FileManager.appGroupUserDataDirectoryURL.appendingPathComponent("/build/hamster.plist")
+            path: (try FileManager.appGroupUserDataDirectoryURL).appendingPathComponent("/build/hamster.plist")
           )
         } catch {
           Logger.statistics.error("hamster configuration didSet error: \(error.localizedDescription)")
@@ -142,10 +142,10 @@ open class HamsterAppDependencyContainer {
       self.configuration = try HamsterConfigurationRepositories.shared.loadFromUserDefaults()
 
       // PATCH
-      if !FileManager.default.fileExists(atPath: FileManager.appGroupUserDataDirectoryURL.appendingPathComponent("/build/hamster.plist").path) {
+      if !FileManager.default.fileExists(atPath: (try FileManager.appGroupUserDataDirectoryURL).appendingPathComponent("/build/hamster.plist").path) {
         try HamsterConfigurationRepositories.shared.saveToPropertyList(
           config: configuration,
-          path: FileManager.appGroupUserDataDirectoryURL.appendingPathComponent("/build/hamster.plist")
+          path: (try FileManager.appGroupUserDataDirectoryURL).appendingPathComponent("/build/hamster.plist")
         )
       }
     } catch {

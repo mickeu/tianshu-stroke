@@ -27,6 +27,7 @@ struct RimeDeployIntent: AppIntent {
 
   @MainActor
   func perform() async throws -> some ReturnsValue {
+    _ = try AppGroupAccess.requireContainer()
     HamsterAppDependencyContainer.shared.mainViewModel.navigationToRIME()
     HamsterAppDependencyContainer.shared.mainViewModel.execShortcutCommand(.rimeDeploy)
     return .result()

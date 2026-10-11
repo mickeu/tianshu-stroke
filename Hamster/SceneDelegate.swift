@@ -12,8 +12,20 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate, UISceneDelegate {
   var window: UIWindow?
 
+  private func showAppGroupDiagnostic(in scene: UIWindowScene) -> Bool {
+    guard !AppGroupAccess.isAvailable else { return false }
+    let window = self.window ?? UIWindow(windowScene: scene)
+    let controller = UIViewController()
+    controller.view = AppGroupAccess.diagnosticView()
+    window.rootViewController = controller
+    self.window = window
+    window.makeKeyAndVisible()
+    return true
+  }
+
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
+    if showAppGroupDiagnostic(in: windowScene) { return }
 
     if window == nil {
       let window = UIWindow(windowScene: windowScene)
@@ -53,6 +65,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UISceneDelegate {
   // 通过URL打开App
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
+    if showAppGroupDiagnostic(in: windowScene) { return }
 
     if window == nil {
       let window = UIWindow(windowScene: windowScene)
@@ -82,6 +95,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, UISceneDelegate {
 
   /// 程序已启动下，通过 quick action 打开
   func windowScene(_ windowScene: UIWindowScene, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+    guard AppGroupAccess.isAvailable else {
+      completionHandler(false)
+      return
+    }
     guard let window = window else { return }
     guard let rootController = window.rootViewController else { return }
     guard let mainViewController = rootController as? MainViewController else { return }

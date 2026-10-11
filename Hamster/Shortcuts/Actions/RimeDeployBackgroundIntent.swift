@@ -27,6 +27,7 @@ struct RimeDeployBackgroundIntent: AppIntent {
 
   @MainActor
   func perform() async throws -> some ReturnsValue<Bool> {
+    _ = try AppGroupAccess.requireContainer()
     var hamsterConfiguration = HamsterAppDependencyContainer.shared.configuration
     do {
       try HamsterAppDependencyContainer.shared.rimeContext.deployment(configuration: &hamsterConfiguration)

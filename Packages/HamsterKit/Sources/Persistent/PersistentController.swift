@@ -8,14 +8,13 @@
 import CoreData
 
 struct PersistentController {
-  static let shared = PersistentController()
+  static let shared = Result { try PersistentController() }
 
   let container: NSPersistentContainer
-  init() {
+  init() throws {
     let name = "HamsterApp"
 
-    let storeURL = FileManager.default.containerURL(
-      forSecurityApplicationGroupIdentifier: HamsterConstants.appGroupName)!
+    let storeURL = try AppGroupAccess.requireContainer()
       .appendingPathComponent("\(name).sqlite")
 
     let storeDescription = NSPersistentStoreDescription(url: storeURL)
@@ -23,7 +22,7 @@ struct PersistentController {
     container.persistentStoreDescriptions = [storeDescription]
     container.loadPersistentStores { _, error in
       if let error = error as NSError? {
-        fatalError("Unresolved error \(error), \(error.userInfo)")
+        NSLog("Shared persistent store failed to load (code: %ld)", error.code)
       }
     }
   }

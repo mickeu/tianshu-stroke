@@ -20,31 +20,31 @@ public class RimeContext {
   public private(set) lazy var useContextPaging = false
 
   /// rime 输入方案列表
-  public private(set) lazy var schemas: [RimeSchema] = UserDefaults.hamster.schemas {
+  public private(set) lazy var schemas: [RimeSchema] = UserDefaults.hamster?.schemas ?? [] {
     didSet {
-      UserDefaults.hamster.schemas = self.schemas
+      UserDefaults.hamster?.schemas = self.schemas
     }
   }
 
   /// rime 用户选择方案列表
-  public lazy var selectSchemas: [RimeSchema] = UserDefaults.hamster.selectSchemas {
+  public lazy var selectSchemas: [RimeSchema] = UserDefaults.hamster?.selectSchemas ?? [] {
     didSet {
-      UserDefaults.hamster.selectSchemas = self.selectSchemas.sorted()
+      UserDefaults.hamster?.selectSchemas = self.selectSchemas.sorted()
     }
   }
 
   /// 当前输入方案
-  public lazy var currentSchema: RimeSchema? = UserDefaults.hamster.currentSchema {
+  public lazy var currentSchema: RimeSchema? = UserDefaults.hamster?.currentSchema {
     didSet {
       // 注意：如果没有完全访问权限，UserDefaults.hamster 会保存失败
-      UserDefaults.hamster.currentSchema = currentSchema
+      UserDefaults.hamster?.currentSchema = currentSchema
     }
   }
 
   /// 上次使用输入方案
-  public lazy var latestSchema: RimeSchema? = UserDefaults.hamster.latestSchema {
+  public lazy var latestSchema: RimeSchema? = UserDefaults.hamster?.latestSchema {
     didSet {
-      UserDefaults.hamster.currentSchema = currentSchema
+      UserDefaults.hamster?.currentSchema = currentSchema
     }
   }
 
@@ -109,9 +109,9 @@ public class RimeContext {
 
   /// switcher hotkeys
   /// 默认值为 F4，但 RIME 重新部署时会根据当前配置加载此值
-  public lazy var hotKeys = UserDefaults.hamster.hotKeys {
+  public lazy var hotKeys = UserDefaults.hamster?.hotKeys ?? [] {
     didSet {
-      UserDefaults.hamster.hotKeys = hotKeys
+      UserDefaults.hamster?.hotKeys = hotKeys
     }
   }
 
@@ -197,12 +197,14 @@ public extension RimeContext {
   /// RIME 启动
   /// 注意：仅用于键盘扩展调用
   func start(hasFullAccess: Bool) async {
+    guard let sharedSupport = try? FileManager.appGroupSharedSupportDirectoryURL,
+          let userData = try? FileManager.appGroupUserDataDirectoryURL else { return }
     Rime.shared.setNotificationDelegate(self)
 
     // 启动
     Rime.shared.start(Rime.createTraits(
-      sharedSupportDir: FileManager.appGroupSharedSupportDirectoryURL.path,
-      userDataDir: hasFullAccess ? FileManager.appGroupUserDataDirectoryURL.path : FileManager.sandboxUserDataDirectory.path
+      sharedSupportDir: sharedSupport.path,
+      userDataDir: hasFullAccess ? userData.path : FileManager.sandboxUserDataDirectory.path
     ))
 
     // 设置初始输入方案
@@ -221,6 +223,8 @@ public extension RimeContext {
   /// RIME 部署
   /// 注意：仅可用于主 App 调用
   func deployment(configuration: inout HamsterConfiguration) throws {
+    // Never touch App Group paths before the OS entitlement check.
+    _ = try AppGroupAccess.requireContainer()
     // 如果开启 iCloud，则先将 iCloud 下文件增量复制到 Sandbox
     if let enableAppleCloud = configuration.general?.enableAppleCloud, enableAppleCloud == true {
       let regex = configuration.general?.regexOnCopyFile ?? []
@@ -322,7 +326,7 @@ public extension RimeContext {
     configuration = try HamsterConfigurationRepositories.shared.loadConfiguration()
 
     // 键盘重新同步文件标志
-    UserDefaults.hamster.overrideRimeDirectory = true
+    UserDefaults.hamster?.overrideRimeDirectory = true
 
     // 保存配置至 build/hamster.yaml
     // try? HamsterConfigurationRepositories.shared.saveToYAML(config: configuration, path: FileManager.hamsterConfigFileOnBuild)
@@ -343,6 +347,7 @@ public extension RimeContext {
   /// RIME 同步
   /// 注意：仅可用于主 App 调用
   func syncRime(configuration: HamsterConfiguration) throws {
+    _ = try AppGroupAccess.requireContainer()
     // 检测文件目录是否存在不存在，新建
     try FileManager.createDirectory(override: false, dst: FileManager.sandboxSharedSupportDirectory)
     try FileManager.createDirectory(override: false, dst: FileManager.sandboxUserDataDirectory)
@@ -369,7 +374,7 @@ public extension RimeContext {
     Rime.shared.shutdown()
 
     // 键盘重新同步文件标志
-    UserDefaults.hamster.overrideRimeDirectory = true
+    UserDefaults.hamster?.overrideRimeDirectory = true
 
     // 保存配置至 build/hamster.yaml
     // try? HamsterConfigurationRepositories.shared.saveToYAML(config: configuration, path: FileManager.hamsterConfigFileOnBuild)
@@ -390,6 +395,7 @@ public extension RimeContext {
   /// RIME 重置
   /// 注意：仅可用于主 App 调用
   func restRime() throws {
+    _ = try AppGroupAccess.requireContainer()
     // 重置输入方案目录
     do {
       try FileManager.initSandboxSharedSupportDirectory(override: true)
@@ -436,7 +442,7 @@ public extension RimeContext {
     }
 
     // 键盘重新同步文件标志
-    UserDefaults.hamster.overrideRimeDirectory = true
+    UserDefaults.hamster?.overrideRimeDirectory = true
 
     // 部署后将方案copy至AppGroup下供keyboard使用
     try FileManager.syncSandboxSharedSupportDirectoryToAppGroup(override: true)

@@ -36,8 +36,15 @@ import UIKit
 open class KeyboardInputViewController: UIInputViewController, KeyboardController {
   // MARK: - View Controller Lifecycle ViewController 生命周期
 
+  private var appGroupUnavailable = false
+
   override open func viewDidLoad() {
     super.viewDidLoad()
+    guard AppGroupAccess.isAvailable else {
+      appGroupUnavailable = true
+      view = AppGroupAccess.diagnosticView()
+      return
+    }
     // setupInitialWidth()
     // setupLocaleObservation()
     // setupNextKeyboardBehavior()
@@ -47,6 +54,7 @@ open class KeyboardInputViewController: UIInputViewController, KeyboardControlle
 
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    guard !appGroupUnavailable, AppGroupAccess.isAvailable else { return }
     setupRIME()
     viewWillSetupKeyboard()
     viewWillSyncWithContext()
@@ -68,6 +76,7 @@ open class KeyboardInputViewController: UIInputViewController, KeyboardControlle
 
   override open func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
+    guard !appGroupUnavailable, AppGroupAccess.isAvailable else { return }
     // Logger.statistics.debug("KeyboardInputViewController: viewDidLayoutSubviews()")
     keyboardContext.syncAfterLayout(with: self)
   }
@@ -75,6 +84,7 @@ open class KeyboardInputViewController: UIInputViewController, KeyboardControlle
   override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     // Logger.statistics.info("controller traitCollectionDidChange()")
     super.traitCollectionDidChange(previousTraitCollection)
+    guard !appGroupUnavailable, AppGroupAccess.isAvailable else { return }
     viewWillSyncWithContext()
   }
 
@@ -137,6 +147,7 @@ open class KeyboardInputViewController: UIInputViewController, KeyboardControlle
    你可以覆盖它以自定义同步或与更多上下文同步。
    */
   open func viewWillSyncWithContext() {
+    guard !appGroupUnavailable, AppGroupAccess.isAvailable else { return }
     keyboardContext.sync(with: self)
     keyboardTextContext.sync(with: self)
   }
@@ -421,12 +432,14 @@ open class KeyboardInputViewController: UIInputViewController, KeyboardControlle
 
   /// 当文档中的选择即将发生变化时，通知输入委托。
   override open func selectionWillChange(_ textInput: UITextInput?) {
+    guard !appGroupUnavailable, AppGroupAccess.isAvailable else { return }
     super.selectionWillChange(textInput)
     resetAutocomplete()
   }
 
   /// 当文档中的选择发生变化时，通知输入委托。
   override open func selectionDidChange(_ textInput: UITextInput?) {
+    guard !appGroupUnavailable, AppGroupAccess.isAvailable else { return }
     super.selectionDidChange(textInput)
     resetAutocomplete()
   }
@@ -435,6 +448,7 @@ open class KeyboardInputViewController: UIInputViewController, KeyboardControlle
   /// - parameters:
   ///   * textInput: 采用 UITextInput 协议的文档实例。
   override open func textWillChange(_ textInput: UITextInput?) {
+    guard !appGroupUnavailable, AppGroupAccess.isAvailable else { return }
     super.textWillChange(textInput)
 
     // fix: 键盘跟随环境显示数字键盘
@@ -450,6 +464,7 @@ open class KeyboardInputViewController: UIInputViewController, KeyboardControlle
   /// - parameters:
   ///   * textInput: 采用 UITextInput 协议的文档实例。
   override open func textDidChange(_ textInput: UITextInput?) {
+    guard !appGroupUnavailable, AppGroupAccess.isAvailable else { return }
     super.textDidChange(textInput)
 //    performAutocomplete()
 //    performTextContextSync()
