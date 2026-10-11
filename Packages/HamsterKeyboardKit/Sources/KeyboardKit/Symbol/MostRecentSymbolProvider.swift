@@ -11,13 +11,13 @@ import HamsterKit
 public class MostRecentSymbolProvider: FrequentSymbolProvider {
   public init(
     maxCount: Int = 30,
-    defaults: UserDefaults = .hamster
+    defaults: UserDefaults? = .hamster
   ) {
     self.maxCount = maxCount
     self.defaults = defaults
   }
   
-  private let defaults: UserDefaults
+  private let defaults: UserDefaults?
   private let maxCount: Int
   public static let key = "com.ihsiao.app.hamster.keyboard.mostRecentSymbolProvider.symbol"
   private static let common = ["，", "。", "？", "！"]
@@ -27,7 +27,7 @@ public class MostRecentSymbolProvider: FrequentSymbolProvider {
   }
   
   var symbolChars: [String] {
-    defaults.stringArray(forKey: Self.key) ?? Self.common
+    defaults?.stringArray(forKey: Self.key) ?? Self.common
   }
   
   func registerSymbol(_ symbol: Symbol) {
@@ -35,10 +35,10 @@ public class MostRecentSymbolProvider: FrequentSymbolProvider {
     symbols.insert(symbol, at: 0)
     let result = Array(symbols.prefix(maxCount))
     let chars = result.map { $0.char }
-    defaults.set(chars, forKey: Self.key)
+    defaults?.set(chars, forKey: Self.key)
   }
   
   public func reset() {
-    defaults.set(Self.common, forKey: Self.key)
+    defaults?.set(Self.common, forKey: Self.key)
   }
 }
