@@ -164,7 +164,7 @@ class KeyboardRootView: NibLessView {
   private func showClipboard() {
     guard !subviews.contains(where: { $0 is ClipboardPanelView }) else { return }
     let panel = ClipboardPanelView(
-      background: appearance.backgroundStyle.backgroundColor,
+      background: appearance.backgroundStyle.backgroundColor ?? .systemBackground,
       foreground: appearance.candidateBarStyle.toolbarButtonFrontColor,
       phrasesOnly: false,
       fullAccess: { [weak self] in self?.keyboardContext.hasFullAccess ?? false },
@@ -179,7 +179,7 @@ class KeyboardRootView: NibLessView {
   private func showPhrases() {
     guard !subviews.contains(where: { $0 is ClipboardPanelView }) else { return }
     let panel = ClipboardPanelView(
-      background: appearance.backgroundStyle.backgroundColor,
+      background: appearance.backgroundStyle.backgroundColor ?? .systemBackground,
       foreground: appearance.candidateBarStyle.toolbarButtonFrontColor,
       phrasesOnly: true,
       fullAccess: { [weak self] in self?.keyboardContext.hasFullAccess ?? false },
