@@ -19,8 +19,8 @@ let package = Package(
       name: "librimeRIME",
       path: "../../Frameworks/librime.xcframework"),
     .binaryTarget(
-      name: "boost_atomicRIME",
-      path: "../../Frameworks/boost_atomic.xcframework"),
+      name: "boost_threadRIME",
+      path: "../../Frameworks/boost_thread.xcframework"),
     .binaryTarget(
       name: "boost_filesystemRIME",
       path: "../../Frameworks/boost_filesystem.xcframework"),
@@ -64,7 +64,7 @@ let package = Package(
       dependencies: [
         "RimeKit",
         "librimeRIME",
-        "boost_atomicRIME",
+        "boost_threadRIME",
         "boost_filesystemRIME",
         "boost_regexRIME",
         "boost_systemRIME",

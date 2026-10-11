@@ -25,8 +25,8 @@ let package = Package(
       name: "librime",
       path: "../../Frameworks/librime.xcframework"),
     .binaryTarget(
-      name: "boost_atomic",
-      path: "../../Frameworks/boost_atomic.xcframework"),
+      name: "boost_thread",
+      path: "../../Frameworks/boost_thread.xcframework"),
     .binaryTarget(
       name: "boost_filesystem",
       path: "../../Frameworks/boost_filesystem.xcframework"),
@@ -72,7 +72,7 @@ let package = Package(
         // "ZippyJSON",
         "RimeKit",
         "librime",
-        "boost_atomic",
+        "boost_thread",
         "boost_filesystem",
         "boost_regex",
         "boost_system",
