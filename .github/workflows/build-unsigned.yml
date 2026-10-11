@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          xcodebuild archive -workspace Hamster.xcworkspace -scheme Hamster -sdk iphoneos -configuration Release -archivePath "$RUNNER_TEMP/Hamster.xcarchive" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+          xcodebuild archive -project Hamster.xcodeproj -scheme Hamster -sdk iphoneos -configuration Release -archivePath "$RUNNER_TEMP/Hamster.xcarchive" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
           APP=$(find "$RUNNER_TEMP/Hamster.xcarchive/Products/Applications" -maxdepth 1 -name '*.app' -type d -print -quit)
           test -n "$APP"
           mkdir -p "$RUNNER_TEMP/Payload"
